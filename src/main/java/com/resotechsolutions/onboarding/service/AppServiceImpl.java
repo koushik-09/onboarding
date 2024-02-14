@@ -6,6 +6,7 @@ import com.resotechsolutions.onboarding.entity.Token;
 import com.resotechsolutions.onboarding.entity.User;
 import com.resotechsolutions.onboarding.entity.UserDTO;
 import com.resotechsolutions.onboarding.entity.UserDetails;
+import com.resotechsolutions.onboarding.mail.MailServiceImplementation;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.CustomResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
@@ -29,19 +30,23 @@ public class AppServiceImpl implements AppService {
 
     private CustomResponse customResponse;
 
+    private MailServiceImplementation mailService;
+
 
     @Autowired
     public AppServiceImpl(AppDaoImplementation theAppDaoImplementation,
                           TokenGenerator theTokenGenerator,
                           BCryptPasswordEncoder thePasswordEncoder,
                           ResponseHandler theResponseHandler,
-                          CustomResponse customResponse
+                          CustomResponse customResponse,
+                          MailServiceImplementation mailService
                           ){
         this.appDaoImplementation = theAppDaoImplementation;
         this.tokenGenerator = theTokenGenerator;
         this.passwordEncoder = thePasswordEncoder;
         this.responseHandler= theResponseHandler;
         this.customResponse = customResponse;
+        this.mailService = mailService;
     }
 
     Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
@@ -69,6 +74,9 @@ public class AppServiceImpl implements AppService {
 
             //Saving the user details into the database
             appDaoImplementation.save(userDTO);
+
+            //sending a welcome mail to user
+            mailService.welcomeEmail(userDTO.getEmail());
 
             //Fetching username of the user from database
             long id = appDaoImplementation.getUserIdByEmail(email);
@@ -122,6 +130,19 @@ public class AppServiceImpl implements AppService {
                                         ,HttpStatus.OK.value(),
                                         customResponse.loginResponse(userDetails));
 
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse updatePassword(String userName, String password) {
+        UserDetails userDetails = appDaoImplementation.getUserDetailsByUserName(userName);
+        if(userDetails == null){
+            String message = "User Does not exist with user-name "+userName;
+            return responseHandler.setMessageResponse(message,HttpStatus.NOT_FOUND.value(),null);
+        }
+        String encryptedPassword = passwordEncoder.encode(password);
+        appDaoImplementation.updatePasswordByUserId(userDetails.getUser_id(),encryptedPassword);
+        return responseHandler.setMessageResponse("Password Updated login to continue",HttpStatus.OK.value(), null);
     }
 
 }

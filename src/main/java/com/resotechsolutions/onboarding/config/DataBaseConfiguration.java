@@ -53,7 +53,6 @@ public class DataBaseConfiguration {
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
 
         driverManagerDataSource.setUrl(environment.getProperty("first.datasource.url"));
-        driverManagerDataSource.setDriverClassName(environment.getProperty("first.datasource.driver-class-name"));
         driverManagerDataSource.setUsername(environment.getProperty("first.datasource.username"));
         driverManagerDataSource.setPassword(environment.getProperty("first.datasource.password"));
 

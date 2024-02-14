@@ -6,6 +6,7 @@ import com.resotechsolutions.onboarding.entity.UserDTO;
 import com.resotechsolutions.onboarding.entity.UserDetails;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,10 +25,6 @@ public class AppDaoImplementation implements AppDao{
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-
-    @Value("${initial.id}")
-    private long initialId;
 
 
     @Override
@@ -128,6 +125,16 @@ public class AppDaoImplementation implements AppDao{
         typedQuery.setParameter("theId",id);
         List<UserDetails> list = typedQuery.getResultList();
         return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
+    public void updatePasswordByUserId(long userId, String password) {
+        String query =
+                "UPDATE user SET password = :newPassword WHERE user_id = :userId";
+        entityManager.createNativeQuery(query)
+                .setParameter("newPassword",password)
+                .setParameter("userId",userId)
+                .executeUpdate();
     }
 
     @Override

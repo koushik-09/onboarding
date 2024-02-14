@@ -19,6 +19,8 @@ public interface AppDao {
 
     UserDetails getUserDetailsByUserId(long id);
 
+    void updatePasswordByUserId(long userId,String password);
+
     void saveToken(long user_id,String token);
 
 
