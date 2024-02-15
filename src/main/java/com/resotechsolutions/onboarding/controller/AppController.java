@@ -5,6 +5,8 @@ import com.resotechsolutions.onboarding.mail.MailServiceImplementation;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
 import com.resotechsolutions.onboarding.service.AppServiceImpl;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,8 @@ public class AppController {
 
     private AppServiceImpl appService;
     private ResponseHandler responseHandler;
+
+    private Log log = LogFactory.getLog(AppController.class);
 
 
     private MailServiceImplementation mailService;

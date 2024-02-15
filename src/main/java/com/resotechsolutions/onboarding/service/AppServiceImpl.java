@@ -1,6 +1,7 @@
 package com.resotechsolutions.onboarding.service;
 
 import com.resotechsolutions.onboarding.config.TokenGenerator;
+import com.resotechsolutions.onboarding.controller.AppController;
 import com.resotechsolutions.onboarding.dao.AppDaoImplementation;
 import com.resotechsolutions.onboarding.entity.Token;
 import com.resotechsolutions.onboarding.entity.User;
@@ -11,6 +12,9 @@ import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.CustomResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
 import javax.transaction.Transactional;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,8 @@ public class AppServiceImpl implements AppService {
     private CustomResponse customResponse;
 
     private MailServiceImplementation mailService;
+
+    private Log log = LogFactory.getLog(AppServiceImpl.class);
 
 
     @Autowired

@@ -1,0 +1,5 @@
+FROM openjdk:8-jdk-alpine
+CMD ["cd /home/prijak/Desktop/microservices"]
+COPY onboarding.jar onboarding.jar
+ENTRYPOINT ["java","-jar","/onboarding.jar"]
+EXPOSE 8091
