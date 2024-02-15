@@ -88,11 +88,11 @@ public class AppServiceImpl implements AppService {
             long id = appDaoImplementation.getUserIdByEmail(email);
             String username = ""+userDTO.getFirstName().charAt(0)+userDTO.getLastName().charAt(0)+id;
             //returning back response
-            return responseHandler.setMessageResponse("Registration Successful",HttpStatus.CREATED.value(),username);
+            return responseHandler.setMessageResponse("Registration Successful",1,username);
         }
         //if user already exists
         String message = "User already exists with email "+email;
-        return responseHandler.setMessageResponse(message,HttpStatus.CONFLICT.value(),null);
+        return responseHandler.setMessageResponse(message,-4,null);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class AppServiceImpl implements AppService {
         UserDetails userDetails = appDaoImplementation.getUserDetailsByUserName(userName);
         if(userDetails == null){
             String message = "User Does not exist with user-name "+userName;
-            return responseHandler.setMessageResponse(message,HttpStatus.NOT_FOUND.value(),null);
+            return responseHandler.setMessageResponse(message,3,null);
         }
         User user = appDaoImplementation.getUserByUserId(userDetails.getUser_id());
         if(passwordEncoder.matches(password,user.getPassword())){
@@ -114,9 +114,9 @@ public class AppServiceImpl implements AppService {
             appDaoImplementation.saveToken(userDetails.getUser_id(),userToken);
             userDetails.setUserToken(userToken);
             //returning back response
-            return responseHandler.setMessageResponse("Login Successful",HttpStatus.OK.value(),customResponse.loginResponse(userDetails));
+            return responseHandler.setMessageResponse("Login Successful",1,customResponse.loginResponse(userDetails));
         }
-        return responseHandler.setMessageResponse("Invalid Password",HttpStatus.UNAUTHORIZED.value(),null);
+        return responseHandler.setMessageResponse("Invalid Password",-1,null);
 
     }
 
@@ -126,14 +126,14 @@ public class AppServiceImpl implements AppService {
         if(tempToken == null){
             return responseHandler
                     .setMessageResponse("Token Does not match"
-                            ,HttpStatus.NOT_FOUND.value(), null);
+                            ,-1, null);
         }
         long userId = tempToken.getUserDetails().getUser_id();
         UserDetails userDetails = appDaoImplementation.getUserDetailsByUserId(userId);
         userDetails.setUserToken(token);
         return responseHandler
                 .setMessageResponse("Token Validation Success"
-                                        ,HttpStatus.OK.value(),
+                                        ,1,
                                         customResponse.loginResponse(userDetails));
 
     }
@@ -144,11 +144,11 @@ public class AppServiceImpl implements AppService {
         UserDetails userDetails = appDaoImplementation.getUserDetailsByUserName(userName);
         if(userDetails == null){
             String message = "User Does not exist with user-name "+userName;
-            return responseHandler.setMessageResponse(message,HttpStatus.NOT_FOUND.value(),null);
+            return responseHandler.setMessageResponse(message,3,null);
         }
         String encryptedPassword = passwordEncoder.encode(password);
         appDaoImplementation.updatePasswordByUserId(userDetails.getUser_id(),encryptedPassword);
-        return responseHandler.setMessageResponse("Password Updated login to continue",HttpStatus.OK.value(), null);
+        return responseHandler.setMessageResponse("Password Updated login to continue",1, null);
     }
 
 }

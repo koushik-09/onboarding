@@ -133,8 +133,14 @@ public class AppDaoImplementation implements AppDao{
     public void updatePasswordByUserId(long userId, String password) {
         String query =
                 "UPDATE user SET password = :newPassword WHERE user_id = :userId";
+
+        String update_query =
+                "UPDATE user_details SET isPasswordUpdated = true WHERE user_id = :userId";
         entityManager.createNativeQuery(query)
                 .setParameter("newPassword",password)
+                .setParameter("userId",userId)
+                .executeUpdate();
+        entityManager.createNativeQuery(update_query)
                 .setParameter("userId",userId)
                 .executeUpdate();
     }

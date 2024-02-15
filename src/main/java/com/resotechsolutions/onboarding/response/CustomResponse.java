@@ -22,6 +22,7 @@ public class CustomResponse {
         responseMap.put("token",userDetails.getUserToken());
         responseMap.put("active",userDetails.isActive());
         responseMap.put("admin",userDetails.isAdmin());
+        responseMap.put("passwordUpdated",userDetails.isPasswordUpdated());
         return responseMap;
     }
 }

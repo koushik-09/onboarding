@@ -36,7 +36,7 @@ public class AppController {
             return appService.save(userDTO);
         }catch (Exception e){
             log.info(e.toString());
-           return responseHandler.setMessageResponse(-1);
+           return responseHandler.setMessageResponse(-2);
         }
     }
 
@@ -58,7 +58,7 @@ public class AppController {
             return appService.validateToken(token);
         }catch (Exception e){
             log.info(e.toString());
-            return responseHandler.setMessageResponse(-3);
+            return responseHandler.setMessageResponse(-2);
         }
     }
 
@@ -69,7 +69,7 @@ public class AppController {
             return appService.updatePassword(username, password);
         }catch (Exception e){
             log.info(e.toString());
-            return responseHandler.setMessageResponse(-4);
+            return responseHandler.setMessageResponse(-2);
         }
     }
 }

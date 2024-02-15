@@ -41,6 +41,9 @@ public class UserDetails {
     @Column(name = "isAdmin")
     private boolean isAdmin;
 
+    @Column(name = "isPasswordUpdated")
+    private boolean isPasswordUpdated;
+
     @Column(name = "created_on")
     private Timestamp createdOn;
 
@@ -227,7 +230,13 @@ public class UserDetails {
         this.userToken = userToken;
     }
 
+    public boolean isPasswordUpdated() {
+        return isPasswordUpdated;
+    }
 
+    public void setPasswordUpdated(boolean passwordUpdated) {
+        isPasswordUpdated = passwordUpdated;
+    }
 ////    @Override
 ////    public String toString() {
 ////        return "UserDetails{" +
@@ -260,6 +269,7 @@ public class UserDetails {
                 ", dateOfBirth=" + dateOfBirth +
                 ", isActive=" + isActive +
                 ", isAdmin=" + isAdmin +
+                ", isPasswordUpdated=" + isPasswordUpdated +
                 ", createdOn=" + createdOn +
                 ", updatedOn=" + updatedOn +
                 ", userToken='" + userToken + '\'' +
