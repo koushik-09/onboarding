@@ -4,15 +4,13 @@ import com.resotechsolutions.onboarding.entity.Token;
 import com.resotechsolutions.onboarding.entity.User;
 import com.resotechsolutions.onboarding.entity.UserDTO;
 import com.resotechsolutions.onboarding.entity.UserDetails;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import javax.persistence.*;
 
+import javax.persistence.EntityManagerFactory;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -21,7 +19,7 @@ public class AppDaoImplementation implements AppDao{
 
 
     @Autowired
-    private@Qualifier("entityManagerFactory") EntityManager entityManager;
+    private @Qualifier("entityManagerFactory") EntityManager entityManager;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

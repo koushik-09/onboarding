@@ -10,7 +10,7 @@ import com.resotechsolutions.onboarding.mail.MailServiceImplementation;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.CustomResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
-import jakarta.transaction.Transactional;
+import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

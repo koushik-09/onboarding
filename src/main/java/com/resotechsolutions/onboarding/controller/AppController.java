@@ -7,12 +7,7 @@ import com.resotechsolutions.onboarding.response.ResponseHandler;
 import com.resotechsolutions.onboarding.service.AppServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class AppController {

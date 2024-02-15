@@ -1,8 +1,7 @@
 package com.resotechsolutions.onboarding.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.*;
-
+import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.List;
