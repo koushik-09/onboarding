@@ -73,7 +73,7 @@ public class AppDaoImplementation implements AppDao{
     @Override
     public void saveToken(long user_id, String token) {
         String query =
-                "UPDATE Token SET token = :theToken , updated_on = :currentTime WHERE user_id = :userId";
+                "UPDATE token SET token = :theToken , updated_on = :currentTime WHERE user_id = :userId";
         entityManager.createNativeQuery(query)
                 .setParameter("theToken",token)
                 .setParameter("userId",user_id)

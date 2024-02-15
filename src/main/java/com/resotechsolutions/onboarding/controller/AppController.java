@@ -1,15 +1,18 @@
 package com.resotechsolutions.onboarding.controller;
 
 import com.resotechsolutions.onboarding.entity.UserDTO;
-import com.resotechsolutions.onboarding.mail.MailServiceImplementation;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
 import com.resotechsolutions.onboarding.service.AppServiceImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Date;
 
 @RestController
 public class AppController {
@@ -20,38 +23,53 @@ public class AppController {
     private Log log = LogFactory.getLog(AppController.class);
 
 
-    private MailServiceImplementation mailService;
     @Autowired
-    public AppController(AppServiceImpl appService,ResponseHandler theResponseHandler,MailServiceImplementation mailService){
+    public AppController(AppServiceImpl appService,ResponseHandler theResponseHandler){
         this.appService = appService;
         this.responseHandler = theResponseHandler;
-        this.mailService = mailService;
     }
 
     @PostMapping("/save")
     public BaseResponse saveUser(@RequestBody UserDTO userDTO){
-        return appService.save(userDTO);
+        try{
+            log.info("***********start of register api in Onboarding Controller " + new Date());
+            return appService.save(userDTO);
+        }catch (Exception e){
+            log.info(e.toString());
+           return responseHandler.setMessageResponse(-1);
+        }
     }
 
-    //request headers
     @PostMapping("/login")
     public BaseResponse validateUser(@RequestHeader("username") String userName, @RequestHeader("password") String password){
-        return appService.validateUser(userName,password);
+        try {
+            log.info("***********start of login api in Onboarding Controller " + new Date());
+            return appService.validateUser(userName, password);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-2);
+        }
     }
 
     @PostMapping("/validate-token")
     public BaseResponse validateToken(@RequestHeader("token") String token){
-        return appService.validateToken(token);
+        try {
+            log.info("***********start of token validation api in Onboarding Controller " + new Date());
+            return appService.validateToken(token);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-3);
+        }
     }
 
     @PostMapping("/update-password")
     public BaseResponse updatePassword(@RequestHeader("username") String username,@RequestHeader("password") String password){
-        return appService.updatePassword(username,password);
-    }
-
-    @GetMapping("/test")
-    public BaseResponse test(){
-        String str = mailService.welcomeEmail("medhireddykittureddy@gmail.com");
-        return responseHandler.setMessageResponse("done", HttpStatus.OK.value(),null);
+        try {
+            log.info("***********start of password update api in Onboarding Controller " + new Date());
+            return appService.updatePassword(username, password);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-4);
+        }
     }
 }

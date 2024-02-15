@@ -25,6 +25,30 @@ public class ResponseHandler {
     }
 
     public BaseResponse setMessageResponse(int code){
+        if(code == -1){
+            status.setStatusCode(code);
+            status.setStatusMessage("Registration Failure");
+            baseResponse.setStatus(status);
+            return baseResponse;
+        }
+        if(code == -2){
+            status.setStatusCode(code);
+            status.setStatusMessage("Login Failure");
+            baseResponse.setStatus(status);
+            return baseResponse;
+        }
+        if(code == -3){
+            status.setStatusCode(code);
+            status.setStatusMessage("Token Validation Failure");
+            baseResponse.setStatus(status);
+            return baseResponse;
+        }
+        if(code == -4){
+            status.setStatusCode(code);
+            status.setStatusMessage("Password Update Failure");
+            baseResponse.setStatus(status);
+            return baseResponse;
+        }
         if(code == 200){
             status.setStatusCode(code);
             status.setStatusMessage("Request Success");
