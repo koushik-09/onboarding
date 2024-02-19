@@ -16,8 +16,8 @@ public class UserDTO {
 
     private String email;
 
+    private long phoneNumber;
     private String token;
-
 
     private String street;
 
@@ -27,12 +27,15 @@ public class UserDTO {
 
     private String country;
 
+    private long pinCode;
 
     private String aadharUrl;
 
     private String panUrl;
 
     private String marksheetUrl;
+
+    private String otp;
 
     public UserDTO() {
     }
@@ -163,6 +166,22 @@ public class UserDTO {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getOtp() {
+        return otp;
+    }
+
+    public void setOtp(String otp) {
+        this.otp = otp;
+    }
+
+    public long getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(long phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     @Override

@@ -1,10 +1,10 @@
 package com.resotechsolutions.onboarding.dao;
 
 
-import com.resotechsolutions.onboarding.entity.Token;
-import com.resotechsolutions.onboarding.entity.User;
-import com.resotechsolutions.onboarding.entity.UserDTO;
-import com.resotechsolutions.onboarding.entity.UserDetails;
+import com.resotechsolutions.onboarding.entity.*;
+
+import java.util.List;
+import java.util.Map;
 
 
 public interface AppDao {
@@ -23,13 +23,20 @@ public interface AppDao {
 
     void saveToken(long user_id,String token);
 
-
     void save(User user);
 
     long getUserIdByEmail(String email);
 
     Token getTokenDataByToken(String token);
 
-
     Token getTokenByUserId(long userId);
+
+    //user authentication methods
+    void createAuthToken(long userId,String token);
+
+    UserAuthentication getAuthDetailsById(long userId);
+
+    EmailContent getEmailTemplateByType(String type);
+
+    Map<String, String> getHeaders(String name);
 }

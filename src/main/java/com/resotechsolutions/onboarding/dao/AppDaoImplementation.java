@@ -1,9 +1,6 @@
 package com.resotechsolutions.onboarding.dao;
 
-import com.resotechsolutions.onboarding.entity.Token;
-import com.resotechsolutions.onboarding.entity.User;
-import com.resotechsolutions.onboarding.entity.UserDTO;
-import com.resotechsolutions.onboarding.entity.UserDetails;
+import com.resotechsolutions.onboarding.entity.*;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +11,10 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Repository
 public class AppDaoImplementation implements AppDao{
@@ -152,6 +152,67 @@ public class AppDaoImplementation implements AppDao{
         typedQuery.setParameter("theData",userId);
         List<Token> list = typedQuery.getResultList();
         return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
+    public void createAuthToken(long userId, String token) {
+        TypedQuery<UserAuthentication> typedQuery = entityManager.createQuery("from UserAuthentication where userId = :theId",UserAuthentication.class);
+        typedQuery.setParameter("theId",userId);
+        List<UserAuthentication> list = typedQuery.getResultList();
+        if(list.isEmpty()){
+            String insert_query =
+                    "INSERT into user_auth (user_id,auth_token) VALUES (:theId,:theToken)";
+            entityManager.createNativeQuery(insert_query)
+                    .setParameter("theId",userId)
+                    .setParameter("theToken",token)
+                    .executeUpdate();
+        }
+        else{
+            String update_query =
+                    "UPDATE user_auth SET auth_token = :theToken , created_on = :currentTime WHERE user_id = :userId";
+            entityManager.createNativeQuery(update_query)
+                    .setParameter("theToken",token)
+                    .setParameter("userId",userId)
+                    .setParameter("currentTime",new Timestamp(System.currentTimeMillis()))
+                    .executeUpdate();
+        }
+    }
+
+    @Override
+    public UserAuthentication getAuthDetailsById(long userId) {
+        TypedQuery<UserAuthentication> typedQuery = entityManager.createQuery("from UserAuthentication where userId = :theId", UserAuthentication.class);
+        typedQuery.setParameter("theId",userId);
+        List<UserAuthentication> list = typedQuery.getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
+    public EmailContent getEmailTemplateByType(String type) {
+        TypedQuery<EmailContent> typedQuery = entityManager.createQuery("from EmailContent where type = :theType", EmailContent.class);
+        typedQuery.setParameter("theType",type);
+        List<EmailContent> list = typedQuery.getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
+
+    @Override
+    public Map<String, String> getHeaders(String name) {
+        String primary_detail_query =
+                "select look_up.value ,look_up.actual_value from look_up where column_name = ? ";
+
+        List<Map<String,Object>> list = jdbcTemplate.queryForList(primary_detail_query,name);
+        Map<String,String> map = new HashMap<>();
+        List<Object[]> list1 = convertList(list);
+        for(Object[] obj : list1){
+            map.put((String) obj[0], (String) obj[1]);
+        }
+        return map;
+    }
+    private List<Object[]> convertList(List<Map<String, Object>> resultList) {
+        List<Object[]> result = resultList.stream()
+                .map(map -> map.values().toArray())
+                .collect(Collectors.toList());
+
+        return result;
     }
 
     @Override

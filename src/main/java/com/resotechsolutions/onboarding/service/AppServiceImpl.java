@@ -1,26 +1,21 @@
 package com.resotechsolutions.onboarding.service;
 
 import com.resotechsolutions.onboarding.config.TokenGenerator;
-import com.resotechsolutions.onboarding.controller.AppController;
 import com.resotechsolutions.onboarding.dao.AppDaoImplementation;
-import com.resotechsolutions.onboarding.entity.Token;
-import com.resotechsolutions.onboarding.entity.User;
-import com.resotechsolutions.onboarding.entity.UserDTO;
-import com.resotechsolutions.onboarding.entity.UserDetails;
+import com.resotechsolutions.onboarding.entity.*;
 import com.resotechsolutions.onboarding.mail.MailServiceImplementation;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.CustomResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
-import javax.transaction.Transactional;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
+import java.sql.Timestamp;
+import java.util.Map;
 
 @Service
 public class AppServiceImpl implements AppService {
@@ -55,7 +50,6 @@ public class AppServiceImpl implements AppService {
         this.mailService = mailService;
     }
 
-    Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
 
     @Override
     @Transactional
@@ -69,7 +63,7 @@ public class AppServiceImpl implements AppService {
         if(userDetails == null) {
             //Generating a default password based on first name and last name
             String password = userDTO.getFirstName() + userDTO.getLastName() + "000";
-            logger.info(password);
+            log.info(password);
 
             //encrypting the default password using BCRYPT
             String encryptedPassword = passwordEncoder.encode(password);
@@ -113,11 +107,11 @@ public class AppServiceImpl implements AppService {
             //storing token into database
             appDaoImplementation.saveToken(userDetails.getUser_id(),userToken);
             userDetails.setUserToken(userToken);
+//            return responseHandler.setMessageResponse("Login Successful",1,userDetails);
             //returning back response
             return responseHandler.setMessageResponse("Login Successful",1,customResponse.loginResponse(userDetails));
         }
         return responseHandler.setMessageResponse("Invalid Password",-1,null);
-
     }
 
     @Override
@@ -140,15 +134,83 @@ public class AppServiceImpl implements AppService {
 
     @Override
     @Transactional
-    public BaseResponse updatePassword(String userName, String password) {
+    public BaseResponse updatePassword(String userName, String password,String token) {
         UserDetails userDetails = appDaoImplementation.getUserDetailsByUserName(userName);
         if(userDetails == null){
             String message = "User Does not exist with user-name "+userName;
             return responseHandler.setMessageResponse(message,3,null);
         }
-        String encryptedPassword = passwordEncoder.encode(password);
-        appDaoImplementation.updatePasswordByUserId(userDetails.getUser_id(),encryptedPassword);
-        return responseHandler.setMessageResponse("Password Updated login to continue",1, null);
+        Token userToken = appDaoImplementation.getTokenDataByToken(token);
+        if(userToken == null){
+            return responseHandler.setMessageResponse("Token is Invalid",-1,null);
+        }
+        if(userDetails.getUser_id() == userToken.getUserDetails().getUser_id()){
+            String encryptedPassword = passwordEncoder.encode(password);
+            appDaoImplementation.updatePasswordByUserId(userDetails.getUser_id(),encryptedPassword);
+            return responseHandler.setMessageResponse("Password Updated login to continue",1, null);
+        }
+        return responseHandler.setMessageResponse("Token is Invalid",-1,null);
     }
 
+    @Override
+    public BaseResponse checkEmailExists(String email) {
+        UserDetails details = appDaoImplementation.findUserDetailByEmail(email);
+        if(details == null){
+            return responseHandler.setMessageResponse("Email does not exists",3,false);
+        }
+        return responseHandler.setMessageResponse("Email Exists",1,true);
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse generateOtp(String email) {
+        UserDetails details = appDaoImplementation.findUserDetailByEmail(email);
+        if(details == null){
+            return responseHandler.setMessageResponse("Email does not exists",3,false);
+        }
+        String otp = tokenGenerator.generateOTP();
+        UserDetails userDetails = appDaoImplementation.findUserDetailByEmail(email);
+        appDaoImplementation.createAuthToken(userDetails.getUser_id(),otp);
+        EmailContent emailContent = appDaoImplementation.getEmailTemplateByType("password-reset");
+        String response = mailService.passwordResetMail(email,otp,emailContent);
+        log.info(response);
+        return responseHandler.setMessageResponse(response,1,null);
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse forgetPassword(String email, String otp,String password) {
+        UserDetails details = appDaoImplementation.findUserDetailByEmail(email);
+        UserAuthentication authDetails = appDaoImplementation.getAuthDetailsById(details.getUser_id());
+        Timestamp time1 = authDetails.getCreatedOn();
+        Timestamp time2 = new Timestamp(System.currentTimeMillis());
+        long difference = time2.getTime() - time1.getTime();
+        long minutes = difference / (60 * 1000);
+        if(minutes>10){
+            return responseHandler.setMessageResponse("OTP expired request new OTP",-1,null);
+        }
+        if(otp.equals(authDetails.getToken())){
+            String encryptedPassword = passwordEncoder.encode(password);
+            appDaoImplementation.updatePasswordByUserId(details.getUser_id(),encryptedPassword);
+            return responseHandler.setMessageResponse("Password Updated login to continue",1, null);
+//            return responseHandler.setMessageResponse("OTP validated successfully",1,details.getUserName());
+        }
+        return responseHandler.setMessageResponse("OTP does not match",-1,null);
+    }
+
+    @Override
+    public BaseResponse getHeaders() {
+        Map<String,String> primaryDetails = appDaoImplementation.getHeaders("primary_details");
+        Map<String,String> graduation = appDaoImplementation.getHeaders("education_graduation");
+        Map<String,String> secondary = appDaoImplementation.getHeaders("education_secondary");
+        Map<String,String> primary = appDaoImplementation.getHeaders("education_primary");
+        Map<String,String> panCard = appDaoImplementation.getHeaders("pan_card");
+        Map<String,String> aadharCard = appDaoImplementation.getHeaders("aadhar_card");
+        Map<String,String> agreement = appDaoImplementation.getHeaders("agreement");
+        Map<String,String> bank = appDaoImplementation.getHeaders("bank");
+        return responseHandler.setMessageResponse("done",1,
+                customResponse.headerResponse(primaryDetails,
+                        graduation,secondary,
+                        primary,panCard,aadharCard,agreement,bank));
+    }
 }

@@ -16,7 +16,6 @@ public class TokenGenerator {
                 email.substring(3, Math.min(email.length(), 7));
         return password;
     }
-
     public String generateNumber(){
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'
@@ -36,5 +35,14 @@ public class TokenGenerator {
                 .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97)).limit(targetStringLength)
                 .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append).toString();
         return encToken;
+    }
+
+    public  String generateOTP() {
+        StringBuilder otp = new StringBuilder();
+        Random random = new Random();
+        for (int i = 0; i < 6; i++) {
+            otp.append(random.nextInt(10));
+        }
+        return otp.toString();
     }
 }

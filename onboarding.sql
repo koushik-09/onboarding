@@ -66,3 +66,25 @@ create table token(
   primary key (id),
   foreign key (user_id) REFERENCES user_details(user_id)
 );
+
+create table email_info(
+   id bigint not null auto_increment,
+   type VARCHAR(50) unique ,
+   subject varchar(100),
+   body VARCHAR(500),
+   cc VARCHAR(235),
+   bcc VARCHAR(235),
+   created_by varchar(30) DEFAULT 'admin',
+   created_on TIMESTAMP DEFAULT current_timestamp,
+   updated_by varchar(30),
+   updated_on TIMESTAMP DEFAULT current_timestamp,
+   primary key (id)
+);
+
+create table user_auth(
+  id bigint not null auto_increment,
+  user_id bigint unique ,
+  auth_token varchar(15),
+  created_on TIMESTAMP DEFAULT current_timestamp,
+  primary key (id)
+);
