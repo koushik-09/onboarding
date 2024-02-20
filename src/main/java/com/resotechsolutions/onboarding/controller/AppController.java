@@ -1,5 +1,6 @@
 package com.resotechsolutions.onboarding.controller;
 
+import com.resotechsolutions.onboarding.dao.AppDaoImplementation;
 import com.resotechsolutions.onboarding.entity.UserDTO;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
@@ -7,8 +8,6 @@ import com.resotechsolutions.onboarding.service.AppServiceImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.RequestEntity;
-import org.springframework.security.access.method.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
@@ -18,6 +17,7 @@ public class AppController {
 
     private AppServiceImpl appService;
     private ResponseHandler responseHandler;
+
 
     private Log log = LogFactory.getLog(AppController.class);
 
@@ -103,11 +103,33 @@ public class AppController {
             return responseHandler.setMessageResponse(-2);
         }
     }
-    @GetMapping("/get-headers")
+    @PostMapping("/get-headers")
     public BaseResponse getHeaders(){
         try {
             log.info("***********start of get headers api in Onboarding Controller " + new Date());
             return appService.getHeaders();
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-2);
+        }
+    }
+
+    @PostMapping("/landing")
+    public BaseResponse landingPage(@RequestHeader("token") String token){
+        try {
+            log.info("***********start of logout api in Onboarding Controller " + new Date());
+            return appService.landingPage(token);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-2);
+        }
+    }
+
+    @PostMapping("/logout")
+    public BaseResponse logout(@RequestHeader("token") String token){
+        try {
+            log.info("***********start of logout api in Onboarding Controller " + new Date());
+            return appService.logout(token);
         }catch (Exception e){
             log.info(e.toString());
             return responseHandler.setMessageResponse(-2);

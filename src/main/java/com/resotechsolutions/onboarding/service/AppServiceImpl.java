@@ -3,6 +3,9 @@ package com.resotechsolutions.onboarding.service;
 import com.resotechsolutions.onboarding.config.TokenGenerator;
 import com.resotechsolutions.onboarding.dao.AppDaoImplementation;
 import com.resotechsolutions.onboarding.entity.*;
+import com.resotechsolutions.onboarding.entity.form.DocumentForm;
+import com.resotechsolutions.onboarding.entity.form.Education;
+import com.resotechsolutions.onboarding.entity.form.Forms;
 import com.resotechsolutions.onboarding.mail.MailServiceImplementation;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.CustomResponse;
@@ -10,16 +13,18 @@ import com.resotechsolutions.onboarding.response.ResponseHandler;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.sql.Timestamp;
-import java.util.Map;
 
 @Service
 public class AppServiceImpl implements AppService {
 
+    @Value("${form.name}")
+    private String[] headerData;
     private AppDaoImplementation appDaoImplementation;
 
     private TokenGenerator tokenGenerator;
@@ -115,6 +120,18 @@ public class AppServiceImpl implements AppService {
     }
 
     @Override
+    public BaseResponse landingPage(String token) {
+        Token userToken = appDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        UserDetails userDetails = userToken.getUserDetails();
+        userDetails.setUserToken(token);
+        return responseHandler.setMessageResponse("Validated",1,customResponse.landingResponse(userDetails));
+    }
+
+
+    @Override
     public BaseResponse validateToken(String token) {
         Token tempToken = appDaoImplementation.getTokenDataByToken(token);
         if(tempToken == null){
@@ -200,17 +217,31 @@ public class AppServiceImpl implements AppService {
 
     @Override
     public BaseResponse getHeaders() {
-        Map<String,String> primaryDetails = appDaoImplementation.getHeaders("primary_details");
-        Map<String,String> graduation = appDaoImplementation.getHeaders("education_graduation");
-        Map<String,String> secondary = appDaoImplementation.getHeaders("education_secondary");
-        Map<String,String> primary = appDaoImplementation.getHeaders("education_primary");
-        Map<String,String> panCard = appDaoImplementation.getHeaders("pan_card");
-        Map<String,String> aadharCard = appDaoImplementation.getHeaders("aadhar_card");
-        Map<String,String> agreement = appDaoImplementation.getHeaders("agreement");
-        Map<String,String> bank = appDaoImplementation.getHeaders("bank");
-        return responseHandler.setMessageResponse("done",1,
-                customResponse.headerResponse(primaryDetails,
-                        graduation,secondary,
-                        primary,panCard,aadharCard,agreement,bank));
+        Forms forms = new Forms();
+
+        Education education = new Education();
+        education.setGraduation(appDaoImplementation.getHeaders("education_graduation"));
+        education.setSecondary(appDaoImplementation.getHeaders("education_secondary"));
+        education.setPrimary(appDaoImplementation.getHeaders("education_primary"));
+
+        forms.setPrimaryDetails(appDaoImplementation.getHeaders("primary_details"));
+        forms.setEducation(education);
+
+        DocumentForm documents = new DocumentForm();
+        documents.setPan(appDaoImplementation.getHeaders("pan_card"));
+        documents.setAadhar(appDaoImplementation.getHeaders("aadhar_card"));
+        forms.setDocuments(documents);
+        return responseHandler.setMessageResponse("done",1,forms);
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse logout(String token) {
+        Token userToken = appDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        appDaoImplementation.deleteTokenById(userToken.getUserDetails().getUser_id());
+        return responseHandler.setMessageResponse("Logout Successful",1,null);
     }
 }

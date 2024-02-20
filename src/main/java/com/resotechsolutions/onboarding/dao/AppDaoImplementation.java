@@ -1,6 +1,7 @@
 package com.resotechsolutions.onboarding.dao;
 
 import com.resotechsolutions.onboarding.entity.*;
+import com.resotechsolutions.onboarding.entity.form.FormData;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -187,6 +187,15 @@ public class AppDaoImplementation implements AppDao{
     }
 
     @Override
+    public void deleteTokenById(long id) {
+        String delete_query =
+                "update token set token = NULL where user_id = :theId";
+        entityManager.createNativeQuery(delete_query)
+                .setParameter("theId",id)
+                .executeUpdate();
+    }
+
+    @Override
     public EmailContent getEmailTemplateByType(String type) {
         TypedQuery<EmailContent> typedQuery = entityManager.createQuery("from EmailContent where type = :theType", EmailContent.class);
         typedQuery.setParameter("theType",type);
@@ -194,25 +203,20 @@ public class AppDaoImplementation implements AppDao{
         return list.isEmpty() ? null : list.get(0);
     }
 
-    @Override
-    public Map<String, String> getHeaders(String name) {
-        String primary_detail_query =
-                "select look_up.value ,look_up.actual_value from look_up where column_name = ? ";
-
-        List<Map<String,Object>> list = jdbcTemplate.queryForList(primary_detail_query,name);
-        Map<String,String> map = new HashMap<>();
-        List<Object[]> list1 = convertList(list);
-        for(Object[] obj : list1){
-            map.put((String) obj[0], (String) obj[1]);
-        }
-        return map;
-    }
     private List<Object[]> convertList(List<Map<String, Object>> resultList) {
         List<Object[]> result = resultList.stream()
                 .map(map -> map.values().toArray())
                 .collect(Collectors.toList());
 
         return result;
+    }
+
+    @Override
+    public List<FormData> getHeaders(String name) {
+        TypedQuery<FormData> typedQuery = entityManager.createQuery("from FormData where columnName = :theName", FormData.class);
+        typedQuery.setParameter("theName",name);
+        List<FormData> list = typedQuery.getResultList();
+        return list;
     }
 
     @Override

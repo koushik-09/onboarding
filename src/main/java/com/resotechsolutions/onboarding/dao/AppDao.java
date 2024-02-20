@@ -2,9 +2,9 @@ package com.resotechsolutions.onboarding.dao;
 
 
 import com.resotechsolutions.onboarding.entity.*;
+import com.resotechsolutions.onboarding.entity.form.FormData;
 
 import java.util.List;
-import java.util.Map;
 
 
 public interface AppDao {
@@ -36,7 +36,10 @@ public interface AppDao {
 
     UserAuthentication getAuthDetailsById(long userId);
 
+    void deleteTokenById(long id);
+
     EmailContent getEmailTemplateByType(String type);
 
-    Map<String, String> getHeaders(String name);
+//    Map<String, String> getHeaders(String name);
+    List<FormData> getHeaders(String name);
 }

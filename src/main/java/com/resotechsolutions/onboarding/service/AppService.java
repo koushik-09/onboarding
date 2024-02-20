@@ -13,6 +13,8 @@ public interface AppService {
 
     BaseResponse validateUser(String userName, String password);
 
+    BaseResponse landingPage(String token);
+
     BaseResponse validateToken(String token);
 
     BaseResponse updatePassword(String username,String password,String token);
@@ -22,5 +24,8 @@ public interface AppService {
     BaseResponse generateOtp(String email);
 
     BaseResponse forgetPassword(String email, String otp,String password);
+
     BaseResponse getHeaders();
+
+    BaseResponse logout(String token);
 }

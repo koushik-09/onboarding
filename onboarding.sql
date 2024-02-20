@@ -52,7 +52,7 @@ create table documents(
 CREATE TABLE `look_up` (
   id bigint NOT NULL AUTO_INCREMENT,
   column_name varchar(20),
-  value int,
+  value varchar(50),
   actual_value varchar(50),
   PRIMARY KEY (`id`)
 );
