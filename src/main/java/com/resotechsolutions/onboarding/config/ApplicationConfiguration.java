@@ -21,5 +21,4 @@ public class ApplicationConfiguration {
         http.logout().disable();
         return http.build();
     }
-
 }

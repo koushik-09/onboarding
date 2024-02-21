@@ -1,6 +1,5 @@
 package com.resotechsolutions.onboarding.controller;
 
-import com.resotechsolutions.onboarding.dao.AppDaoImplementation;
 import com.resotechsolutions.onboarding.entity.UserDTO;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
@@ -8,7 +7,10 @@ import com.resotechsolutions.onboarding.service.AppServiceImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 
@@ -38,7 +40,17 @@ public class AppController {
            return responseHandler.setMessageResponse(-2);
         }
     }
-
+    @PostMapping("/update-details")
+    public BaseResponse updateUserDetails(@RequestHeader String token, @RequestBody UserDTO userDTO){
+        try {
+            log.info("***********start of update user details api in Onboarding Controller " + new Date());
+            userDTO.setToken(token);
+            return appService.updateUserDetails(userDTO);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-2);
+        }
+    }
     @PostMapping("/validate-token")
     public BaseResponse validateToken(@RequestHeader("token") String token){
         try {

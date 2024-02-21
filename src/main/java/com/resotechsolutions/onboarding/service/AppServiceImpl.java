@@ -110,6 +110,20 @@ public class AppServiceImpl implements AppService {
 
     @Override
     @Transactional
+    public BaseResponse updateUserDetails(UserDTO userDTO) {
+        Token token = tokenDaoImplementation.getTokenDataByToken(userDTO.getToken());
+        if (token == null){
+            return responseHandler
+                    .setMessageResponse("Invalid Token"
+                            ,-1, null);
+        }
+        userDTO.setId(token.getUserDetails().getUser_id());
+        userDetailDaoImplementation.updateUserDetailsByUserId(userDTO);
+        return responseHandler.setMessageResponse("Details Updated",1,null);
+    }
+
+    @Override
+    @Transactional
     public BaseResponse validateUser(String userName, String password) {
         UserDetails userDetails = userDetailDaoImplementation.getUserDetailsByUserName(userName);
         if(userDetails == null){

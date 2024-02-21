@@ -5,7 +5,6 @@ import java.time.LocalDate;
 public class UserDTO {
 
     private long id;
-
     private String firstName;
 
     private String lastName;
@@ -17,6 +16,9 @@ public class UserDTO {
     private String email;
 
     private long phoneNumber;
+
+    private char gender;
+    private LocalDate dateOfBirth;
     private String token;
 
     private String street;
@@ -182,6 +184,30 @@ public class UserDTO {
 
     public void setPhoneNumber(long phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public char getGender() {
+        return gender;
+    }
+
+    public void setGender(char gender) {
+        this.gender = gender;
+    }
+
+    public long getPinCode() {
+        return pinCode;
+    }
+
+    public void setPinCode(long pinCode) {
+        this.pinCode = pinCode;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
     }
 
     @Override

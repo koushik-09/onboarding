@@ -11,6 +11,8 @@ public interface AppService {
 
     BaseResponse registerUserDetails(UserDTO userDTO);
 
+    BaseResponse updateUserDetails(UserDTO userDTO);
+
     BaseResponse validateUser(String userName, String password);
 
     BaseResponse landingPage(String token);
