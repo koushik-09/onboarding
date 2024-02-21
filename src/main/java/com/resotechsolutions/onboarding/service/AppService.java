@@ -9,7 +9,7 @@ import java.sql.Timestamp;
 
 public interface AppService {
 
-    BaseResponse save(UserDTO userDTO);
+    BaseResponse registerUserDetails(UserDTO userDTO);
 
     BaseResponse validateUser(String userName, String password);
 
@@ -19,9 +19,13 @@ public interface AppService {
 
     BaseResponse updatePassword(String username,String password,String token);
 
+    BaseResponse changePassword(String email,String password);
+
     BaseResponse checkEmailExists(String email);
 
     BaseResponse generateOtp(String email);
+
+    BaseResponse validateOtp(String email,String otp);
 
     BaseResponse forgetPassword(String email, String otp,String password);
 

@@ -32,21 +32,10 @@ public class AppController {
     public BaseResponse saveUser(@RequestBody UserDTO userDTO){
         try{
             log.info("***********start of register api in Onboarding Controller " + new Date());
-            return appService.save(userDTO);
+            return appService.registerUserDetails(userDTO);
         }catch (Exception e){
             log.info(e.toString());
            return responseHandler.setMessageResponse(-2);
-        }
-    }
-
-    @PostMapping("/login")
-    public BaseResponse validateUser(@RequestHeader("username") String userName, @RequestHeader("password") String password){
-        try {
-            log.info("***********start of login api in Onboarding Controller " + new Date());
-            return appService.validateUser(userName, password);
-        }catch (Exception e){
-            log.info(e.toString());
-            return responseHandler.setMessageResponse(-2);
         }
     }
 
@@ -78,26 +67,6 @@ public class AppController {
         try {
             log.info("***********start of validate email api in Onboarding Controller " + new Date());
             return appService.checkEmailExists(userDTO.getEmail());
-        }catch (Exception e){
-            log.info(e.toString());
-            return responseHandler.setMessageResponse(-2);
-        }
-    }
-    @PostMapping("/forget-password")
-    public BaseResponse generateOtp(@RequestBody UserDTO userDTO){
-        try {
-            log.info("***********start of forget password api in Onboarding Controller " + new Date());
-            return appService.generateOtp(userDTO.getEmail());
-        }catch (Exception e){
-            log.info(e.toString());
-            return responseHandler.setMessageResponse(-2);
-        }
-    }
-    @PostMapping("/validate-otp")
-    public BaseResponse validateOtp(@RequestBody UserDTO userDTO){
-        try {
-            log.info("***********start of validate otp api in Onboarding Controller " + new Date());
-            return appService.forgetPassword(userDTO.getEmail(), userDTO.getOtp(), userDTO.getPassword());
         }catch (Exception e){
             log.info(e.toString());
             return responseHandler.setMessageResponse(-2);
