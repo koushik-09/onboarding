@@ -1,6 +1,8 @@
 package com.resotechsolutions.onboarding.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 import java.sql.Timestamp;
@@ -12,6 +14,7 @@ public class Address {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name =  "id")
+    @JsonIgnore
     private long id;
 
     @Column(name = "street")
@@ -30,9 +33,11 @@ public class Address {
     private long pinCode;
 
     @Column(name = "created_on")
+    @JsonIgnore
     private Timestamp createdOn;
 
     @Column(name = "updated_on")
+    @JsonIgnore
     private Timestamp updatedOn;
 
     @OneToOne

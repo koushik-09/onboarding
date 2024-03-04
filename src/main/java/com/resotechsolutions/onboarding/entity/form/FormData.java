@@ -1,43 +1,26 @@
 package com.resotechsolutions.onboarding.entity.form;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "look_up")
 public class FormData{
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private long id;
-
-    @Column(name = "column_name")
-    private String columnName;
-
-    @Column(name = "value")
-    private String value;
-
-    @Column(name = "actual_value")
-    private String actualValue;
-
-
+    String field;
+    Object data;
 
     public FormData() {
     }
 
-    public String getValue() {
-        return value;
+    public String getField() {
+        return field;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setField(String field) {
+        this.field = field;
     }
 
-    public String getActualValue() {
-        return actualValue;
+    public Object getData() {
+        return data;
     }
 
-    public void setActualValue(String actualValue) {
-        this.actualValue = actualValue;
+    public void setData(Object data) {
+        this.data = data;
     }
 }

@@ -1,4 +1,4 @@
-package com.resotechsolutions.onboarding.entity;
+package com.resotechsolutions.onboarding.entity.dto;
 
 import java.time.LocalDate;
 
@@ -31,21 +31,19 @@ public class UserDTO {
 
     private long pinCode;
 
-    private String aadharUrl;
-
-    private String panUrl;
-
-    private String marksheetUrl;
-
     private String otp;
+
+    private String panNumber;
+
+    private long aadharNumber;
+
 
     public UserDTO() {
     }
 
     public UserDTO(String firstName,String lastName, String email,
                    String street, String city,
-                   String state, String country,
-                   String aadharUrl, String panUrl, String marksheetUrl) {
+                   String state, String country) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -53,9 +51,6 @@ public class UserDTO {
         this.city = city;
         this.state = state;
         this.country = country;
-        this.aadharUrl = aadharUrl;
-        this.panUrl = panUrl;
-        this.marksheetUrl = marksheetUrl;
     }
 
     public long getId() {
@@ -130,30 +125,6 @@ public class UserDTO {
         this.country = country;
     }
 
-    public String getAadharUrl() {
-        return aadharUrl;
-    }
-
-    public void setAadharUrl(String aadharUrl) {
-        this.aadharUrl = aadharUrl;
-    }
-
-    public String getPanUrl() {
-        return panUrl;
-    }
-
-    public void setPanUrl(String panUrl) {
-        this.panUrl = panUrl;
-    }
-
-    public String getMarksheetUrl() {
-        return marksheetUrl;
-    }
-
-    public void setMarksheetUrl(String marksheetUrl) {
-        this.marksheetUrl = marksheetUrl;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -219,9 +190,6 @@ public class UserDTO {
                 ", city='" + city + '\'' +
                 ", state='" + state + '\'' +
                 ", country='" + country + '\'' +
-                ", aadharUrl='" + aadharUrl + '\'' +
-                ", panUrl='" + panUrl + '\'' +
-                ", marksheetUrl='" + marksheetUrl + '\'' +
                 '}';
     }
 }

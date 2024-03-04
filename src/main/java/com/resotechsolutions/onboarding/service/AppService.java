@@ -1,11 +1,10 @@
 package com.resotechsolutions.onboarding.service;
 
-import com.resotechsolutions.onboarding.entity.UserDTO;
-import com.resotechsolutions.onboarding.entity.User;
-import com.resotechsolutions.onboarding.entity.UserDetails;
+import com.resotechsolutions.onboarding.entity.dto.BankDto;
+import com.resotechsolutions.onboarding.entity.dto.EducationDTO;
+import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.response.BaseResponse;
-
-import java.sql.Timestamp;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface AppService {
 
@@ -13,13 +12,23 @@ public interface AppService {
 
     BaseResponse updateUserDetails(UserDTO userDTO);
 
+    BaseResponse updateEducationDetails(String token,EducationDTO educationDTO);
+
     BaseResponse validateUser(String userName, String password);
 
     BaseResponse landingPage(String token);
 
+    BaseResponse getUserDetails(String token);
+
     BaseResponse validateToken(String token);
 
     BaseResponse updatePassword(String username,String password,String token);
+
+    BaseResponse updateUserDocuments(MultipartFile file,String token,String documentType);
+
+    BaseResponse updateMultipleUserDocuments(MultipartFile file,String token);
+
+    BaseResponse updateBankDetails(String token, BankDto bankDto);
 
     BaseResponse changePassword(String email,String password);
 

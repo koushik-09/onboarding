@@ -3,6 +3,7 @@ package com.resotechsolutions.onboarding.response;
 import com.resotechsolutions.onboarding.entity.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -19,19 +20,11 @@ public class CustomResponse {
         responseMap.put("lastName",userDetails.getLastName());
         responseMap.put("email",userDetails.getEmail());
         responseMap.put("token",userDetails.getUserToken());
-        if(userDetails.getAddress() != null){
-            data++;
-            responseMap.put("address",userDetails.getAddress());
-        }
-        if(!userDetails.getDocuments().isEmpty()){
-            data++;
-            responseMap.put("Documents",userDetails.getDocuments());
-        }
         responseMap.put("active",userDetails.isActive());
         responseMap.put("admin",userDetails.isAdmin());
         responseMap.put("passwordUpdated",userDetails.isPasswordUpdated());
-        int percentage = (data*100)/6;
-        responseMap.put("Percentage Complete",percentage);
+//        int percentage = (data*100)/6;
+//        responseMap.put("Percentage Complete",percentage);
         return responseMap;
     }
 
@@ -46,10 +39,10 @@ public class CustomResponse {
         responseMap.put("token",userDetails.getUserToken());
         if(userDetails.getAddress() != null){
             data++;
-            responseMap.put("address",true);
+            responseMap.put("Personal Information",true);
         }
         else{
-            responseMap.put("address",false);
+            responseMap.put("Personal Information",false);
         }
         boolean pan = false;
         boolean aadhar = false;
@@ -68,14 +61,73 @@ public class CustomResponse {
                 }
             }
         }
-        responseMap.put("Pan",pan);
-        responseMap.put("Aadhar",aadhar);
-        responseMap.put("markSheet",markSheet);
+        responseMap.put("Pan Card",pan);
+        responseMap.put("Aadhar Card",aadhar);
+        responseMap.put("marks sheets",markSheet);
+        if(!userDetails.getEducation().isEmpty()){
+            data++;
+            responseMap.put("Education Details",true);
+        }
+        else responseMap.put("Education Details",false);
+        if(userDetails.getBank()!=null){
+            data++;
+            responseMap.put("Bank Details",true);
+        }else responseMap.put("Bank Details",false);
         responseMap.put("active",userDetails.isActive());
         responseMap.put("admin",userDetails.isAdmin());
         responseMap.put("passwordUpdated",userDetails.isPasswordUpdated());
-        System.out.println(data);
-        int percentage = (data*100)/6;
+        int percentage = (data*100)/7;
+        responseMap.put("Percentage Complete",percentage);
+        return responseMap;
+    }
+
+    public Map<String,Object> userDetailsResponse(UserDetails userDetails){
+        Map<String,Object> responseMap = new LinkedHashMap<>();
+        int data = 1;
+        responseMap.put("user_id",userDetails.getUser_id());
+        responseMap.put("username",userDetails.getUserName());
+        responseMap.put("firstName",userDetails.getFirstName());
+        responseMap.put("lastName",userDetails.getLastName());
+        responseMap.put("email",userDetails.getEmail());
+        responseMap.put("token",userDetails.getUserToken());
+        if(userDetails.getAddress() != null){
+            data++;
+            responseMap.put("address",userDetails.getAddress());
+        }
+        if(!userDetails.getDocuments().isEmpty()){
+            data+=userDetails.getDocuments().size();
+            for(int i=0;i<userDetails.getDocuments().size();i++) {
+                if (userDetails.getDocuments().get(i).getType() == 1) {
+                    userDetails.getDocuments().get(i).setName("Pan Card");
+                } else if (userDetails.getDocuments().get(i).getType() == 2) {
+                    userDetails.getDocuments().get(i).setName("Aadhar Card");
+                } else if (userDetails.getDocuments().get(i).getType() == 3) {
+                    userDetails.getDocuments().get(i).setName("Marksheet");
+                }
+            }
+            responseMap.put("Documents",userDetails.getDocuments());
+        }
+        if(!userDetails.getEducation().isEmpty()){
+            data++;
+            for(int i=0;i<userDetails.getEducation().size();i++){
+                if(userDetails.getEducation().get(i).getType() == 1){
+                    userDetails.getEducation().get(i).setName("Graduation");
+                }else if(userDetails.getEducation().get(i).getType() == 2){
+                    userDetails.getEducation().get(i).setName("Secondary");
+                }else if(userDetails.getEducation().get(i).getType() == 3){
+                    userDetails.getEducation().get(i).setName("Primary");
+                }
+            }
+            responseMap.put("Education Details",userDetails.getEducation());
+        }
+        if(userDetails.getBank()!=null){
+            data++;
+            responseMap.put("Bank Details",userDetails.getBank());
+        }
+        responseMap.put("active",userDetails.isActive());
+        responseMap.put("admin",userDetails.isAdmin());
+        responseMap.put("passwordUpdated",userDetails.isPasswordUpdated());
+        int percentage = (data*100)/7;
         responseMap.put("Percentage Complete",percentage);
         return responseMap;
     }

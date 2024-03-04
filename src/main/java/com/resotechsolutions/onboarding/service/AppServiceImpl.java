@@ -1,13 +1,11 @@
 package com.resotechsolutions.onboarding.service;
 
 import com.resotechsolutions.onboarding.config.TokenGenerator;
-import com.resotechsolutions.onboarding.dao.AppDaoImplementation;
-import com.resotechsolutions.onboarding.dao.TokenDaoImplementation;
-import com.resotechsolutions.onboarding.dao.UserDaoImplementation;
-import com.resotechsolutions.onboarding.dao.UserDetailDaoImplementation;
+import com.resotechsolutions.onboarding.dao.*;
 import com.resotechsolutions.onboarding.entity.*;
-import com.resotechsolutions.onboarding.entity.form.DocumentForm;
-import com.resotechsolutions.onboarding.entity.form.Education;
+import com.resotechsolutions.onboarding.entity.dto.BankDto;
+import com.resotechsolutions.onboarding.entity.dto.EducationDTO;
+import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.entity.form.Forms;
 import com.resotechsolutions.onboarding.mail.MailServiceImplementation;
 import com.resotechsolutions.onboarding.response.BaseResponse;
@@ -19,19 +17,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 
 @Service
 public class AppServiceImpl implements AppService {
 
-    @Value("${form.name}")
-    private String[] headerData;
     private AppDaoImplementation appDaoImplementation;
 
     private UserDetailDaoImplementation userDetailDaoImplementation;
     private UserDaoImplementation userDaoImplementation;
+    private AddressDaoImplementation addressDaoImplementation;
+    private EducationDaoImplementation educationDaoImplementation;
+    private DocumentDaoImplementation documentDaoImplementation;
+    private BankDaoImplementation bankDaoImplementation;
 
     private TokenDaoImplementation tokenDaoImplementation;
 
@@ -46,12 +51,19 @@ public class AppServiceImpl implements AppService {
 
     private Log log = LogFactory.getLog(AppServiceImpl.class);
 
+    @Value("${file.url}")
+    private String FOLDER_PATH;
+
 
     @Autowired
     public AppServiceImpl(AppDaoImplementation theAppDaoImplementation,
                           UserDetailDaoImplementation userDetailDaoImplementation,
                           UserDaoImplementation userDaoImplementation,
                           TokenDaoImplementation tokenDaoImplementation,
+                          AddressDaoImplementation addressDaoImplementation,
+                          EducationDaoImplementation educationDaoImplementation,
+                          DocumentDaoImplementation documentDaoImplementation,
+                          BankDaoImplementation bankDaoImplementation,
                           TokenGenerator theTokenGenerator,
                           BCryptPasswordEncoder thePasswordEncoder,
                           ResponseHandler theResponseHandler,
@@ -62,6 +74,10 @@ public class AppServiceImpl implements AppService {
         this.userDetailDaoImplementation = userDetailDaoImplementation;
         this.userDaoImplementation = userDaoImplementation;
         this.tokenDaoImplementation = tokenDaoImplementation;
+        this.addressDaoImplementation = addressDaoImplementation;
+        this.educationDaoImplementation = educationDaoImplementation;
+        this.documentDaoImplementation = documentDaoImplementation;
+        this.bankDaoImplementation = bankDaoImplementation;
         this.tokenGenerator = theTokenGenerator;
         this.passwordEncoder = thePasswordEncoder;
         this.responseHandler= theResponseHandler;
@@ -82,7 +98,6 @@ public class AppServiceImpl implements AppService {
         if(userDetails == null) {
             //Generating a default password based on first name and last name
             String password = userDTO.getFirstName() + userDTO.getLastName() + "000";
-            log.info(password);
 
             //encrypting the default password using BCRYPT
             String encryptedPassword = passwordEncoder.encode(password);
@@ -94,12 +109,14 @@ public class AppServiceImpl implements AppService {
             //Saving the user details into the database
             userDetailDaoImplementation.registerUserDetails(userDTO);
 
-            //sending a welcome mail to user
-            mailService.welcomeEmail(userDTO.getEmail());
-
             //Fetching username of the user from database
             long id = userDetailDaoImplementation.getUserIdByEmail(email);
             String username = ""+userDTO.getFirstName().charAt(0)+userDTO.getLastName().charAt(0)+id;
+
+            //sending a welcome mail to user
+            EmailContent emailContent = appDaoImplementation.getEmailTemplateByType("welcome-email");
+            mailService.welcomeEmail(userDTO.getEmail(),username,password,emailContent);
+
             //returning back response
             return responseHandler.setMessageResponse("Registration Successful",1,username);
         }
@@ -119,6 +136,19 @@ public class AppServiceImpl implements AppService {
         }
         userDTO.setId(token.getUserDetails().getUser_id());
         userDetailDaoImplementation.updateUserDetailsByUserId(userDTO);
+        addressDaoImplementation.updateAddressByUserId(userDTO);
+        return responseHandler.setMessageResponse("Details Updated",1,null);
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse updateEducationDetails(String token, EducationDTO educationDTO) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if(userToken == null){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        educationDTO.setId(userToken.getUserDetails().getUser_id());
+        educationDaoImplementation.updateEducationDetails(educationDTO);
         return responseHandler.setMessageResponse("Details Updated",1,null);
     }
 
@@ -133,10 +163,12 @@ public class AppServiceImpl implements AppService {
         User user = userDaoImplementation.getUserByUserId(userDetails.getUser_id());
         if(passwordEncoder.matches(password,user.getPassword())){
             Token token = tokenDaoImplementation.getTokenByUserId(userDetails.getUser_id());
+            System.out.println(token.getToken());
             userDetails = user.getUserDetails();
             userDetails.setUser(null);
             //generating a new token for user
             String userToken = tokenGenerator.generateToken();
+            System.out.println(userToken);
             //storing token into database
             tokenDaoImplementation.saveToken(userDetails.getUser_id(),userToken);
             userDetails.setUserToken(userToken);
@@ -156,6 +188,17 @@ public class AppServiceImpl implements AppService {
         UserDetails userDetails = userToken.getUserDetails();
         userDetails.setUserToken(token);
         return responseHandler.setMessageResponse("Validated",1,customResponse.landingResponse(userDetails));
+    }
+
+    @Override
+    public BaseResponse getUserDetails(String token) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        UserDetails userDetails = userDetailDaoImplementation.getUserDetailsByUserId(userToken.getUserDetails().getUser_id());
+        userDetails.setUserToken(token);
+        return responseHandler.setMessageResponse("Success",1,customResponse.userDetailsResponse(userDetails));
     }
 
 
@@ -199,6 +242,85 @@ public class AppServiceImpl implements AppService {
 
     @Override
     @Transactional
+    public BaseResponse updateUserDocuments(MultipartFile file, String token,String documentType) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        long userId = userToken.getUserDetails().getUser_id();
+        String dir =FOLDER_PATH +  documentType.toLowerCase();
+        try{
+            Files.createDirectories(Paths.get(dir));
+            String timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
+            String fileName = userId + "_"+file.getOriginalFilename();
+            String filePath = dir + "/" + fileName;
+//            file.transferTo(Paths.get(filePath)); documentType.equalsIgnoreCase("pan")
+            Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+            if(documentType.equalsIgnoreCase("pan")){
+                documentDaoImplementation.updateUserDocuments(filePath,userId,1);
+            }else if(documentType.equalsIgnoreCase("aadhar")){
+                documentDaoImplementation.updateUserDocuments(filePath,userId,2);
+            }else if(documentType.equalsIgnoreCase("marksheet")){
+                documentDaoImplementation.updateUserDocuments(filePath,userId,3);
+            }
+            return responseHandler.setMessageResponse("Upload Success",1,filePath);
+        } catch (IOException e) {
+            log.warn(e.toString());
+            return responseHandler.setMessageResponse("Upload Failure",-2,null);
+        }
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse updateMultipleUserDocuments(MultipartFile file, String token) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        long userId = userToken.getUserDetails().getUser_id();
+        String dir = FOLDER_PATH;
+        if(file.getOriginalFilename().toLowerCase().contains("pan")){
+            dir += "pan";
+        }else if(file.getOriginalFilename().toLowerCase().contains("aadhar")){
+            dir += "aadhar";
+        }else if(file.getOriginalFilename().toLowerCase().contains("marksheet")){
+            dir += "marksheet";
+        }
+        try{
+            Files.createDirectories(Paths.get(dir));
+            String timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
+            String fileName = userId + "_"+file.getOriginalFilename();
+            String filePath = dir + "/" + fileName;
+//            file.transferTo(Paths.get(filePath)); documentType.equalsIgnoreCase("pan")
+            Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+            if(file.getOriginalFilename().toLowerCase().contains("pan")){
+                documentDaoImplementation.updateUserDocuments(filePath,userId,1);
+            }else if(file.getOriginalFilename().toLowerCase().contains("aadhar")){
+                documentDaoImplementation.updateUserDocuments(filePath,userId,2);
+            }else if(file.getOriginalFilename().toLowerCase().contains("marksheet")){
+                documentDaoImplementation.updateUserDocuments(filePath,userId,3);
+            }
+            return responseHandler.setMessageResponse("Upload Success",1,filePath);
+        } catch (IOException e) {
+            log.warn(e.toString());
+            return responseHandler.setMessageResponse("Upload Failure",-2,null);
+        }
+    }
+
+    @Override
+    @Transactional
+    public BaseResponse updateBankDetails(String token, BankDto bankDto) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        bankDto.setId(userToken.getUserDetails().getUser_id());
+        bankDaoImplementation.updateBankDetailsByUserId(bankDto);
+        return responseHandler.setMessageResponse("Details Updated",1,null);
+    }
+
+    @Override
+    @Transactional
     public BaseResponse changePassword(String email, String password) {
         UserDetails details = userDetailDaoImplementation.findUserDetailByEmail(email);
         if(details == null){
@@ -226,8 +348,7 @@ public class AppServiceImpl implements AppService {
             return responseHandler.setMessageResponse("Email does not exists",3,false);
         }
         String otp = tokenGenerator.generateOTP();
-        UserDetails userDetails = userDetailDaoImplementation.findUserDetailByEmail(email);
-        appDaoImplementation.createAuthToken(userDetails.getUser_id(),otp);
+        appDaoImplementation.createAuthToken(details.getUser_id(),otp);
         EmailContent emailContent = appDaoImplementation.getEmailTemplateByType("password-reset");
         String response = mailService.passwordResetMail(email,otp,emailContent);
         log.info(response);
@@ -275,19 +396,13 @@ public class AppServiceImpl implements AppService {
     @Override
     public BaseResponse getHeaders() {
         Forms forms = new Forms();
-
-        Education education = new Education();
-        education.setGraduation(appDaoImplementation.getHeaders("education_graduation"));
-        education.setSecondary(appDaoImplementation.getHeaders("education_secondary"));
-        education.setPrimary(appDaoImplementation.getHeaders("education_primary"));
-
-        forms.setPrimaryDetails(appDaoImplementation.getHeaders("primary_details"));
-        forms.setEducation(education);
-
-        DocumentForm documents = new DocumentForm();
-        documents.setPan(appDaoImplementation.getHeaders("pan_card"));
-        documents.setAadhar(appDaoImplementation.getHeaders("aadhar_card"));
-        forms.setDocuments(documents);
+        forms.setPersonalDetails(appDaoImplementation.getFormData("personal_details"));
+        forms.setEducation(appDaoImplementation.getFormData("education"));
+        forms.setPanDetails(appDaoImplementation.getFormData("pan_details"));
+        forms.setAadharDetails(appDaoImplementation.getFormData("aadhar_details"));
+        forms.setMarksheetDetails(appDaoImplementation.getFormData("marksheet_details"));
+        forms.setAgreementDetails(appDaoImplementation.getFormData("agreement"));
+        forms.setBankDetails(appDaoImplementation.getFormData("bank_details"));
         return responseHandler.setMessageResponse("done",1,forms);
     }
 

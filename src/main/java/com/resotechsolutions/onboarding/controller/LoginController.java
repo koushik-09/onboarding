@@ -1,6 +1,6 @@
 package com.resotechsolutions.onboarding.controller;
 
-import com.resotechsolutions.onboarding.entity.UserDTO;
+import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
 import com.resotechsolutions.onboarding.service.AppServiceImpl;
@@ -35,6 +35,16 @@ public class LoginController {
         try {
             log.info("***********start of login api in Onboarding Login Controller " + new Date());
             return appService.validateUser(userName, password);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-2);
+        }
+    }
+    @PostMapping("/get-details")
+    public BaseResponse getUserDetails(@RequestHeader("token") String token){
+        try {
+            log.info("***********start of forget password api in Onboarding Login Controller " + new Date());
+            return appService.getUserDetails(token);
         }catch (Exception e){
             log.info(e.toString());
             return responseHandler.setMessageResponse(-2);

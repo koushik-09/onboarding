@@ -1,14 +1,13 @@
 package com.resotechsolutions.onboarding.dao;
 
 import com.resotechsolutions.onboarding.entity.*;
-import com.resotechsolutions.onboarding.entity.form.FormData;
+import com.resotechsolutions.onboarding.entity.form.DynamicForm;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import java.sql.Timestamp;
@@ -71,19 +70,11 @@ public class AppDaoImplementation implements AppDao{
         return list.isEmpty() ? null : list.get(0);
     }
 
-    private List<Object[]> convertList(List<Map<String, Object>> resultList) {
-        List<Object[]> result = resultList.stream()
-                .map(map -> map.values().toArray())
-                .collect(Collectors.toList());
-
-        return result;
-    }
-
     @Override
-    public List<FormData> getHeaders(String name) {
-        TypedQuery<FormData> typedQuery = entityManager.createQuery("from FormData where columnName = :theName", FormData.class);
+    public List<DynamicForm> getFormData(String name) {
+        TypedQuery<DynamicForm> typedQuery = entityManager.createQuery("from DynamicForm where columnName = :theName order by order asc", DynamicForm.class);
         typedQuery.setParameter("theName",name);
-        List<FormData> list = typedQuery.getResultList();
+        List<DynamicForm> list = typedQuery.getResultList();
         return list;
     }
 }

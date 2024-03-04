@@ -2,7 +2,7 @@ package com.resotechsolutions.onboarding.dao;
 
 
 import com.resotechsolutions.onboarding.entity.*;
-import com.resotechsolutions.onboarding.entity.form.FormData;
+import com.resotechsolutions.onboarding.entity.form.DynamicForm;
 
 import java.util.List;
 
@@ -16,6 +16,5 @@ public interface AppDao {
 
     EmailContent getEmailTemplateByType(String type);
 
-//    Map<String, String> getHeaders(String name);
-    List<FormData> getHeaders(String name);
+    List<DynamicForm> getFormData(String name);
 }

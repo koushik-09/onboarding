@@ -1,6 +1,6 @@
 package com.resotechsolutions.onboarding.dao;
 
-import com.resotechsolutions.onboarding.entity.UserDTO;
+import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.entity.UserDetails;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -72,28 +72,12 @@ public class UserDetailDaoImplementation implements UserDetailDao{
     public void updateUserDetailsByUserId(UserDTO userDTO) {
         String detail_update_query =
                 "UPDATE user_details SET phone_number = :phNo, gender = :gender, dob = :dob, updated_on = :currentTime where user_id = :id";
-
-        String address_update_query =
-                "UPDATE address SET street = :street, city = :city," +
-                        " state = :state, country = :country, pin_code = :pinCode, updated_on = :currentTime " +
-                        "WHERE user_id = :id";
-
         entityManager.createNativeQuery(detail_update_query)
                 .setParameter("phNo",userDTO.getPhoneNumber())
                 .setParameter("gender",userDTO.getGender())
                 .setParameter("dob",userDTO.getDateOfBirth())
                 .setParameter("id",userDTO.getId())
                 .setParameter("currentTime",new Timestamp(System.currentTimeMillis()))
-                .executeUpdate();
-
-        entityManager.createNativeQuery(address_update_query)
-                .setParameter("street",userDTO.getStreet())
-                .setParameter("city",userDTO.getCity())
-                .setParameter("state",userDTO.getState())
-                .setParameter("country",userDTO.getCountry())
-                .setParameter("pinCode",userDTO.getPinCode())
-                .setParameter("currentTime",new Timestamp(System.currentTimeMillis()))
-                .setParameter("id",userDTO.getId())
                 .executeUpdate();
     }
 

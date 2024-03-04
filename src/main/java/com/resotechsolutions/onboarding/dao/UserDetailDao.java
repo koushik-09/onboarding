@@ -1,6 +1,6 @@
 package com.resotechsolutions.onboarding.dao;
 
-import com.resotechsolutions.onboarding.entity.UserDTO;
+import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.entity.UserDetails;
 
 public interface UserDetailDao {

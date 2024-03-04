@@ -1,16 +1,15 @@
 package com.resotechsolutions.onboarding.controller;
 
-import com.resotechsolutions.onboarding.entity.UserDTO;
+import com.resotechsolutions.onboarding.dao.AppDaoImplementation;
+import com.resotechsolutions.onboarding.entity.dto.EducationDTO;
+import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.response.BaseResponse;
 import com.resotechsolutions.onboarding.response.ResponseHandler;
 import com.resotechsolutions.onboarding.service.AppServiceImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 
@@ -20,37 +19,30 @@ public class AppController {
     private AppServiceImpl appService;
     private ResponseHandler responseHandler;
 
+    private AppDaoImplementation appDaoImplementation;
+
 
     private Log log = LogFactory.getLog(AppController.class);
 
 
     @Autowired
-    public AppController(AppServiceImpl appService,ResponseHandler theResponseHandler){
+    public AppController(AppServiceImpl appService,ResponseHandler theResponseHandler,AppDaoImplementation appDaoImplementation){
         this.appService = appService;
         this.responseHandler = theResponseHandler;
+        this.appDaoImplementation = appDaoImplementation;
     }
 
     @PostMapping("/save")
     public BaseResponse saveUser(@RequestBody UserDTO userDTO){
         try{
-            log.info("***********start of register api in Onboarding Controller " + new Date());
+            log.info("***********start of user registration api in Onboarding Controller " + new Date());
             return appService.registerUserDetails(userDTO);
         }catch (Exception e){
             log.info(e.toString());
            return responseHandler.setMessageResponse(-2);
         }
     }
-    @PostMapping("/update-details")
-    public BaseResponse updateUserDetails(@RequestHeader String token, @RequestBody UserDTO userDTO){
-        try {
-            log.info("***********start of update user details api in Onboarding Controller " + new Date());
-            userDTO.setToken(token);
-            return appService.updateUserDetails(userDTO);
-        }catch (Exception e){
-            log.info(e.toString());
-            return responseHandler.setMessageResponse(-2);
-        }
-    }
+
     @PostMapping("/validate-token")
     public BaseResponse validateToken(@RequestHeader("token") String token){
         try {
@@ -98,7 +90,7 @@ public class AppController {
     @PostMapping("/landing")
     public BaseResponse landingPage(@RequestHeader("token") String token){
         try {
-            log.info("***********start of logout api in Onboarding Controller " + new Date());
+            log.info("***********start of landing api in Onboarding Controller " + new Date());
             return appService.landingPage(token);
         }catch (Exception e){
             log.info(e.toString());
@@ -115,5 +107,9 @@ public class AppController {
             log.info(e.toString());
             return responseHandler.setMessageResponse(-2);
         }
+    }
+    @GetMapping("/hello")
+    public String hell(){
+        return "Hello World";
     }
 }

@@ -35,7 +35,7 @@ public class EmailContent {
     @Column(name = "updated_by")
     private String updatedBy;
 
-    @Column(name = "updatedd_on")
+    @Column(name = "updated_on")
     private Timestamp updatedOn;
 
     public EmailContent() {

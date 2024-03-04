@@ -68,6 +68,12 @@ public class UserDetails {
     @OneToMany(mappedBy = "userDetails", cascade = CascadeType.ALL)
     private List<Documents> documents;
 
+    @OneToMany(mappedBy = "userDetails",cascade = CascadeType.ALL)
+    private List<Education> education;
+
+    @OneToOne(mappedBy = "userDetails",cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Bank bank;
 
     public UserDetails() {
     }
@@ -128,6 +134,14 @@ public class UserDetails {
 
     public String getEmail() {
         return email;
+    }
+
+    public Bank getBank() {
+        return bank;
+    }
+
+    public void setBank(Bank bank) {
+        this.bank = bank;
     }
 
     public void setEmail(String email) {
@@ -237,24 +251,14 @@ public class UserDetails {
     public void setPasswordUpdated(boolean passwordUpdated) {
         isPasswordUpdated = passwordUpdated;
     }
-////    @Override
-////    public String toString() {
-////        return "UserDetails{" +
-////                "user_id=" + user_id +
-////                ", userName='" + userName + '\'' +
-////                ", firstName='" + firstName + '\'' +
-////                ", lastName='" + lastName + '\'' +
-////                ", email='" + email + '\'' +
-////                ", phoneNumber=" + phoneNumber +
-////                ", gender=" + gender +
-////                ", dateOfBirth=" + dateOfBirth +
-////                ", isActive=" + isActive +
-////                ", isAdmin=" + isAdmin +
-////                ", createdOn=" + createdOn +
-////                ", updatedOn=" + updatedOn +
-////                '}';
-//    }
 
+    public List<Education> getEducation() {
+        return education;
+    }
+
+    public void setEducation(List<Education> education) {
+        this.education = education;
+    }
 
     @Override
     public String toString() {

@@ -1,6 +1,8 @@
 package com.resotechsolutions.onboarding.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 
@@ -15,18 +17,25 @@ public class Documents {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
+    @JsonIgnore
     private long id;
 
     @Column(name = "type")
+    @JsonIgnore
     private int type;
+
+    @Transient
+    private String name;
 
     @Column(name = "url")
     private String url;
 
     @Column(name = "created_on")
+    @JsonIgnore
     private Timestamp createdOn;
 
     @Column(name = "updated_on")
+    @JsonIgnore
     private Timestamp updatedOn;
 
     @ManyToOne
@@ -47,6 +56,14 @@ public class Documents {
 
     public int getType() {
         return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setType(int type) {
@@ -77,6 +94,15 @@ public class Documents {
         this.updatedOn = updatedOn;
     }
 
-
+    @Override
+    public String toString() {
+        return "Documents{" +
+                "id=" + id +
+                ", type=" + type +
+                ", url='" + url + '\'' +
+                ", createdOn=" + createdOn +
+                ", updatedOn=" + updatedOn +
+                '}';
+    }
 }
 
