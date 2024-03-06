@@ -27,6 +27,9 @@ public class Documents {
     @Transient
     private String name;
 
+    @Column(name = "number")
+    private String number;
+
     @Column(name = "url")
     private String url;
 
@@ -76,6 +79,14 @@ public class Documents {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getNumber() {
+        return number;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public Timestamp getCreatedOn() {

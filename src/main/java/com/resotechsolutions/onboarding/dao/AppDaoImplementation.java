@@ -77,4 +77,12 @@ public class AppDaoImplementation implements AppDao{
         List<DynamicForm> list = typedQuery.getResultList();
         return list;
     }
+
+    @Override
+    public LookUp getTypeByIdentifier(String identifier) {
+        TypedQuery<LookUp> typedQuery = entityManager.createQuery("from LookUp where identifier = :theIdentifier",LookUp.class);
+        typedQuery.setParameter("theIdentifier",identifier);
+        List<LookUp> list = typedQuery.getResultList();
+        return list.isEmpty() ? null : list.get(0);
+    }
 }

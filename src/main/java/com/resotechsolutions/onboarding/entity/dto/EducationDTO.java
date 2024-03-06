@@ -13,18 +13,21 @@ public class EducationDTO {
     private float gradCgpa;
     private int gradStart;
     private int gradEnd;
+    private String gradMemoUrl;
     private String secondDegree;
     private String secondMajor;
     private String secondInstitution;
     private float secondCgpa;
     private int secondStart;
     private int secondEnd;
+    private String secondMemoUrl;
     private String primDegree;
     private String primMajor;
     private String primInstitution;
     private float primCgpa;
     private int primStart;
     private int primEnd;
+    private String primMemoUrl;
 
     public EducationDTO() {
     }
@@ -198,6 +201,30 @@ public class EducationDTO {
 
     public void setPrimEnd(int primEnd) {
         this.primEnd = primEnd;
+    }
+
+    public String getGradMemoUrl() {
+        return gradMemoUrl;
+    }
+
+    public void setGradMemoUrl(String gradMemoUrl) {
+        this.gradMemoUrl = gradMemoUrl;
+    }
+
+    public String getSecondMemoUrl() {
+        return secondMemoUrl;
+    }
+
+    public void setSecondMemoUrl(String secondMemoUrl) {
+        this.secondMemoUrl = secondMemoUrl;
+    }
+
+    public String getPrimMemoUrl() {
+        return primMemoUrl;
+    }
+
+    public void setPrimMemoUrl(String primMemoUrl) {
+        this.primMemoUrl = primMemoUrl;
     }
 
     @Override

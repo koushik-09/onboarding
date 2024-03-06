@@ -1,6 +1,14 @@
 package com.resotechsolutions.onboarding.entity.form;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -16,7 +24,7 @@ public class Forms {
 
     private List<FormData> aadharDetails = new ArrayList<>();
 
-    private List<FormData> marksheetDetails = new ArrayList<>();
+//    private List<FormData> marksheetDetails = new ArrayList<>();
 
     private List<FormData> agreementDetails = new ArrayList<>();
 
@@ -49,9 +57,9 @@ public class Forms {
         populateForm(dynamicForms,aadharDetails);
     }
 
-    public void setMarksheetDetails(List<DynamicForm> dynamicForms) {
-        populateForm(dynamicForms,marksheetDetails);
-    }
+//    public void setMarksheetDetails(List<DynamicForm> dynamicForms) {
+//        populateForm(dynamicForms,marksheetDetails);
+//    }
 
     public void setAgreementDetails(List<DynamicForm> dynamicForms) {
         populateForm(dynamicForms,agreementDetails);
@@ -77,9 +85,9 @@ public class Forms {
         return aadharDetails;
     }
 
-    public List<FormData> getMarksheetDetails() {
-        return marksheetDetails;
-    }
+//    public List<FormData> getMarksheetDetails() {
+//        return marksheetDetails;
+//    }
 
     public void populateForm(List<DynamicForm> dynamicForms, List<FormData> list){
         for (DynamicForm form : dynamicForms){
@@ -92,7 +100,12 @@ public class Forms {
                     field.setAccessible(true);
                     if(!field.getName().equals("id") && !field.getName().equals("field") && !field.getName().equalsIgnoreCase("columnName") && !field.getName().equalsIgnoreCase("order")){
                         if(field.get(form)!=null){
-                            map.put(field.getName(),field.get(form));
+                            if(field.getName().equalsIgnoreCase("options")){
+                                map.put(field.getName(),convertStringToJsonArray((String) field.get(form)));
+                            }
+                            else{
+                                map.put(field.getName(),field.get(form));
+                            }
                         }
                     }
                 }
@@ -102,5 +115,11 @@ public class Forms {
             }
         }
     }
+    public List<Gender> convertStringToJsonArray(String jsonString) {
+        Gson gson = new Gson();
+        Type listType = new TypeToken<List<Gender>>() {}.getType();
+        List<Gender> genderList = gson.fromJson(jsonString, listType);
 
+        return genderList;
+    }
 }

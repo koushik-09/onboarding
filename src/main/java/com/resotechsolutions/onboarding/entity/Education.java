@@ -2,6 +2,7 @@ package com.resotechsolutions.onboarding.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -39,6 +40,9 @@ public class Education {
 
     @Column(name = "end")
     private int endYear;
+
+    @Column(name = "url")
+    private String memoUrl;
 
     @Column(name = "created_on")
     @JsonIgnore
@@ -159,6 +163,14 @@ public class Education {
 
     public void setUserDetails(UserDetails userDetails) {
         this.userDetails = userDetails;
+    }
+
+    public String getMemoUrl() {
+        return memoUrl;
+    }
+
+    public void setMemoUrl(String memoUrl) {
+        this.memoUrl = memoUrl;
     }
 
     @Override

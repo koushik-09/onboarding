@@ -46,7 +46,7 @@ public class CustomResponse {
         }
         boolean pan = false;
         boolean aadhar = false;
-        boolean markSheet = false;
+        boolean agreement = false;
         if(!userDetails.getDocuments().isEmpty()){
             for(int i=0;i<userDetails.getDocuments().size();i++){
                 if(userDetails.getDocuments().get(i).getType() == 1){
@@ -57,13 +57,13 @@ public class CustomResponse {
                     aadhar = true;
                 } else if (userDetails.getDocuments().get(i).getType() == 3) {
                     data++;
-                    markSheet = true;
+                    agreement = true;
                 }
             }
         }
         responseMap.put("Pan Card",pan);
         responseMap.put("Aadhar Card",aadhar);
-        responseMap.put("marks sheets",markSheet);
+        responseMap.put("Agreement",agreement);
         if(!userDetails.getEducation().isEmpty()){
             data++;
             responseMap.put("Education Details",true);
@@ -94,19 +94,6 @@ public class CustomResponse {
             data++;
             responseMap.put("address",userDetails.getAddress());
         }
-        if(!userDetails.getDocuments().isEmpty()){
-            data+=userDetails.getDocuments().size();
-            for(int i=0;i<userDetails.getDocuments().size();i++) {
-                if (userDetails.getDocuments().get(i).getType() == 1) {
-                    userDetails.getDocuments().get(i).setName("Pan Card");
-                } else if (userDetails.getDocuments().get(i).getType() == 2) {
-                    userDetails.getDocuments().get(i).setName("Aadhar Card");
-                } else if (userDetails.getDocuments().get(i).getType() == 3) {
-                    userDetails.getDocuments().get(i).setName("Marksheet");
-                }
-            }
-            responseMap.put("Documents",userDetails.getDocuments());
-        }
         if(!userDetails.getEducation().isEmpty()){
             data++;
             for(int i=0;i<userDetails.getEducation().size();i++){
@@ -119,6 +106,19 @@ public class CustomResponse {
                 }
             }
             responseMap.put("Education Details",userDetails.getEducation());
+        }
+        if(!userDetails.getDocuments().isEmpty()){
+            data+=userDetails.getDocuments().size();
+            for(int i=0;i<userDetails.getDocuments().size();i++) {
+                if (userDetails.getDocuments().get(i).getType() == 1) {
+                    userDetails.getDocuments().get(i).setName("Pan Card");
+                } else if (userDetails.getDocuments().get(i).getType() == 2) {
+                    userDetails.getDocuments().get(i).setName("Aadhar Card");
+                } else if (userDetails.getDocuments().get(i).getType() == 3) {
+                    userDetails.getDocuments().get(i).setName("Agreement");
+                }
+            }
+            responseMap.put("Documents",userDetails.getDocuments());
         }
         if(userDetails.getBank()!=null){
             data++;

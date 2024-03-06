@@ -1,6 +1,7 @@
 package com.resotechsolutions.onboarding.controller;
 
 import com.resotechsolutions.onboarding.entity.dto.BankDto;
+import com.resotechsolutions.onboarding.entity.dto.DocumentDto;
 import com.resotechsolutions.onboarding.entity.dto.EducationDTO;
 import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.response.BaseResponse;
@@ -41,10 +42,20 @@ public class FormController {
     }
 
     @PostMapping("/update-education")
-    public BaseResponse test(@RequestHeader("token")String token,@RequestBody EducationDTO educationDTO){
+    public BaseResponse updateEducationDetails(@RequestHeader("token")String token,@RequestBody EducationDTO educationDTO){
         try {
-            log.info("***********start of update education details api in Onboarding Controller " + new Date());
+            log.info("***********start of update education details api in Onboarding form Controller " + new Date());
             return appService.updateEducationDetails(token,educationDTO);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-2);
+        }
+    }
+    @PostMapping("/save-document")
+    public BaseResponse updateDocumentDetails(@RequestHeader("token") String token, @RequestBody DocumentDto documentDto){
+        try {
+            log.info("***********start of document details update api in Onboarding form Controller " + new Date());
+            return appService.updateDocumentDetails(token,documentDto);
         }catch (Exception e){
             log.info(e.toString());
             return responseHandler.setMessageResponse(-2);
@@ -54,7 +65,7 @@ public class FormController {
     @PostMapping("/upload-document")
     public BaseResponse uploadUserDocuments(@RequestPart("file")MultipartFile file,
                                             @RequestHeader("token") String token,
-                                            @RequestPart("type")String docType){
+                                            @RequestPart("name")String docType){
         try{
             log.info("***********start of upload document api in Onboarding form Controller " + new Date());
             return appService.updateUserDocuments(file,token,docType);

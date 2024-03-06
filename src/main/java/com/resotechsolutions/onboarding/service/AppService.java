@@ -1,6 +1,7 @@
 package com.resotechsolutions.onboarding.service;
 
 import com.resotechsolutions.onboarding.entity.dto.BankDto;
+import com.resotechsolutions.onboarding.entity.dto.DocumentDto;
 import com.resotechsolutions.onboarding.entity.dto.EducationDTO;
 import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.response.BaseResponse;
@@ -30,6 +31,10 @@ public interface AppService {
 
     BaseResponse updateBankDetails(String token, BankDto bankDto);
 
+    BaseResponse updateDocumentDetails(String token,DocumentDto documentDto);
+
+//    BaseResponse downloadAgreement(String token);
+
     BaseResponse changePassword(String email,String password);
 
     BaseResponse checkEmailExists(String email);
@@ -43,4 +48,6 @@ public interface AppService {
     BaseResponse getHeaders();
 
     BaseResponse logout(String token);
+
+    BaseResponse changePasswordUpdated(String token);
 }

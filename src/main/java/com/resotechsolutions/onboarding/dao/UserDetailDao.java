@@ -12,4 +12,6 @@ public interface UserDetailDao {
     UserDetails findUserDetailByEmail(String email);
     UserDetails getUserDetailsByUserId(long id);
     long getUserIdByEmail(String email);
+
+    void changePasswordUpdated(long userId);
 }

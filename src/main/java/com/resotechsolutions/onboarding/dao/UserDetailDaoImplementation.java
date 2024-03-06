@@ -109,4 +109,13 @@ public class UserDetailDaoImplementation implements UserDetailDao{
         List<UserDetails> list = typedQuery.getResultList();
         return list.isEmpty() ? 0 : list.get(0).getUser_id();
     }
+
+    @Override
+    public void changePasswordUpdated(long userId) {
+        String query =
+                "UPDATE user_details SET isPasswordUpdated = false WHERE user_id = :userId";
+        entityManager.createNativeQuery(query)
+                .setParameter("userId",userId)
+                .executeUpdate();
+    }
 }

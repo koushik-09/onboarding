@@ -17,4 +17,7 @@ public interface AppDao {
     EmailContent getEmailTemplateByType(String type);
 
     List<DynamicForm> getFormData(String name);
+
+    LookUp getTypeByIdentifier(String identifier);
+
 }

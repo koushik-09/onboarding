@@ -4,6 +4,7 @@ import com.resotechsolutions.onboarding.config.TokenGenerator;
 import com.resotechsolutions.onboarding.dao.*;
 import com.resotechsolutions.onboarding.entity.*;
 import com.resotechsolutions.onboarding.entity.dto.BankDto;
+import com.resotechsolutions.onboarding.entity.dto.DocumentDto;
 import com.resotechsolutions.onboarding.entity.dto.EducationDTO;
 import com.resotechsolutions.onboarding.entity.dto.UserDTO;
 import com.resotechsolutions.onboarding.entity.form.Forms;
@@ -25,6 +26,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 public class AppServiceImpl implements AppService {
@@ -103,7 +106,7 @@ public class AppServiceImpl implements AppService {
             String encryptedPassword = passwordEncoder.encode(password);
             userDTO.setPassword(encryptedPassword);
 
-            String userName = userDTO.getFirstName() + userDTO.getLastName();
+            String userName = userDTO.getFirstName().toLowerCase() + userDTO.getLastName().toLowerCase();
             userDTO.setUserName(userName);
 
             //Saving the user details into the database
@@ -111,7 +114,7 @@ public class AppServiceImpl implements AppService {
 
             //Fetching username of the user from database
             long id = userDetailDaoImplementation.getUserIdByEmail(email);
-            String username = ""+userDTO.getFirstName().charAt(0)+userDTO.getLastName().charAt(0)+id;
+            String username = ""+userDTO.getFirstName().toLowerCase().charAt(0) +userDTO.getLastName().toLowerCase().charAt(0)+id;
 
             //sending a welcome mail to user
             EmailContent emailContent = appDaoImplementation.getEmailTemplateByType("welcome-email");
@@ -163,12 +166,10 @@ public class AppServiceImpl implements AppService {
         User user = userDaoImplementation.getUserByUserId(userDetails.getUser_id());
         if(passwordEncoder.matches(password,user.getPassword())){
             Token token = tokenDaoImplementation.getTokenByUserId(userDetails.getUser_id());
-            System.out.println(token.getToken());
             userDetails = user.getUserDetails();
             userDetails.setUser(null);
             //generating a new token for user
             String userToken = tokenGenerator.generateToken();
-            System.out.println(userToken);
             //storing token into database
             tokenDaoImplementation.saveToken(userDetails.getUser_id(),userToken);
             userDetails.setUserToken(userToken);
@@ -240,6 +241,7 @@ public class AppServiceImpl implements AppService {
         return responseHandler.setMessageResponse("Token is Invalid",-1,null);
     }
 
+
     @Override
     @Transactional
     public BaseResponse updateUserDocuments(MultipartFile file, String token,String documentType) {
@@ -248,21 +250,27 @@ public class AppServiceImpl implements AppService {
             return responseHandler.setMessageResponse("Invalid token",-1,null);
         }
         long userId = userToken.getUserDetails().getUser_id();
-        String dir =FOLDER_PATH +  documentType.toLowerCase();
+        LookUp lookUp = appDaoImplementation.getTypeByIdentifier(documentType);
+        if(lookUp == null){
+            return responseHandler.setMessageResponse("Invalid Document type",-1,null);
+        }
+        String dir =FOLDER_PATH+"/documents/" + documentType.toLowerCase();
         try{
+            //creating directory
             Files.createDirectories(Paths.get(dir));
-            String timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
-            String fileName = userId + "_"+file.getOriginalFilename();
+            //timestamp
+            Date currentDate = new Date();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+            String timestamp = dateFormat.format(currentDate);
+            //naming file
+//            String name = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","-" );
+            String fileName = userId + "_"+timestamp+"_"+file.getOriginalFilename().replace(" ","-");
+            //generating file path
             String filePath = dir + "/" + fileName;
-//            file.transferTo(Paths.get(filePath)); documentType.equalsIgnoreCase("pan")
+            //saving the file
             Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
-            if(documentType.equalsIgnoreCase("pan")){
-                documentDaoImplementation.updateUserDocuments(filePath,userId,1);
-            }else if(documentType.equalsIgnoreCase("aadhar")){
-                documentDaoImplementation.updateUserDocuments(filePath,userId,2);
-            }else if(documentType.equalsIgnoreCase("marksheet")){
-                documentDaoImplementation.updateUserDocuments(filePath,userId,3);
-            }
+            documentDaoImplementation.updateUrl(filePath,userId);
+//            documentDaoImplementation.updateUserDocuments(filePath,userId,type);
             return responseHandler.setMessageResponse("Upload Success",1,filePath);
         } catch (IOException e) {
             log.warn(e.toString());
@@ -318,6 +326,25 @@ public class AppServiceImpl implements AppService {
         bankDaoImplementation.updateBankDetailsByUserId(bankDto);
         return responseHandler.setMessageResponse("Details Updated",1,null);
     }
+
+    @Override
+    @Transactional
+    public BaseResponse updateDocumentDetails(String token,DocumentDto documentDto) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        long userId = userToken.getUserDetails().getUser_id();
+        LookUp lookUp = appDaoImplementation.getTypeByIdentifier(documentDto.getName());
+        if(lookUp == null){
+            return responseHandler.setMessageResponse("Invalid Document type",-1,null);
+        }
+        documentDto.setId(userId);
+        documentDto.setType(lookUp.getValue());
+        documentDaoImplementation.updateUserDocuments(documentDto);
+        return responseHandler.setMessageResponse(documentDto.getName()+" Details Updated",1,null);
+    }
+
 
     @Override
     @Transactional
@@ -400,7 +427,7 @@ public class AppServiceImpl implements AppService {
         forms.setEducation(appDaoImplementation.getFormData("education"));
         forms.setPanDetails(appDaoImplementation.getFormData("pan_details"));
         forms.setAadharDetails(appDaoImplementation.getFormData("aadhar_details"));
-        forms.setMarksheetDetails(appDaoImplementation.getFormData("marksheet_details"));
+//        forms.setMarksheetDetails(appDaoImplementation.getFormData("marksheet_details"));
         forms.setAgreementDetails(appDaoImplementation.getFormData("agreement"));
         forms.setBankDetails(appDaoImplementation.getFormData("bank_details"));
         return responseHandler.setMessageResponse("done",1,forms);
@@ -416,4 +443,25 @@ public class AppServiceImpl implements AppService {
         tokenDaoImplementation.deleteTokenById(userToken.getUserDetails().getUser_id());
         return responseHandler.setMessageResponse("Logout Successful",1,null);
     }
+
+    @Override
+    @Transactional
+    public BaseResponse changePasswordUpdated(String token) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        userDetailDaoImplementation.changePasswordUpdated(userToken.getUserDetails().getUser_id());
+        return responseHandler.setMessageResponse("Password status changed to false",1,null);
+    }
 }
+
+
+//            file.transferTo(Paths.get(filePath)); documentType.equalsIgnoreCase("pan")
+//            if(documentType.equalsIgnoreCase("pan")){
+//                documentDaoImplementation.updateUserDocuments(filePath,userId,1);
+//            }else if(documentType.equalsIgnoreCase("aadhar")){
+//                documentDaoImplementation.updateUserDocuments(filePath,userId,2);
+//            }else if(documentType.equalsIgnoreCase("marksheet")){
+//                documentDaoImplementation.updateUserDocuments(filePath,userId,3);
+//            }

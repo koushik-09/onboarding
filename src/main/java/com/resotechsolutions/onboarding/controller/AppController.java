@@ -112,4 +112,14 @@ public class AppController {
     public String hell(){
         return "Hello World";
     }
+    @PostMapping("/change-password-status")
+    public BaseResponse changePasswordStatus(@RequestHeader("token") String token){
+        try {
+            log.info("***********start of password status change api in Onboarding Controller " + new Date());
+            return appService.changePasswordUpdated(token);
+        }catch (Exception e){
+            log.info(e.toString());
+            return responseHandler.setMessageResponse(-2);
+        }
+    }
 }

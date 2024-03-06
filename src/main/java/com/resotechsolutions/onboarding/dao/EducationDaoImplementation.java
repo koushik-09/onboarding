@@ -55,11 +55,11 @@ public class EducationDaoImplementation implements EducationDao {
     @Override
     public void updateEducationDetails(EducationDTO education) {
         String insert_query =
-                "insert into education (user_id, type, degree_name, major, institution_name, cgpa, start, end) " +
-                        "values (:theId,:type,:degree,:major,:inst,:cgpa,:start,:end)";
+                "insert into education (user_id, type, degree_name, major, institution_name, cgpa, start, end,url) " +
+                        "values (:theId,:type,:degree,:major,:inst,:cgpa,:start,:end,:url)";
         String update_query =
                 "update education set type = :type,degree_name =:degree ,major = :major" +
-                        " ,institution_name = :inst,cgpa = :cgpa,start = :start,end = :end where user_id = :theId and type = :type";
+                        " ,institution_name = :inst,cgpa = :cgpa,start = :start,end = :end,url = :url where user_id = :theId and type = :type";
         if (getEducationDetailsByUserIdAndType(education.getId(), 1) == null) {
             entityManager.createNativeQuery(insert_query)
                     .setParameter("theId", education.getId())
@@ -70,6 +70,7 @@ public class EducationDaoImplementation implements EducationDao {
                     .setParameter("cgpa", education.getGradCgpa())
                     .setParameter("start", education.getGradStart())
                     .setParameter("end", education.getGradEnd())
+                    .setParameter("url",education.getGradMemoUrl())
                     .executeUpdate();
         } else {
             entityManager.createNativeQuery(update_query)
@@ -81,6 +82,7 @@ public class EducationDaoImplementation implements EducationDao {
                     .setParameter("cgpa", education.getGradCgpa())
                     .setParameter("start", education.getGradStart())
                     .setParameter("end", education.getGradEnd())
+                    .setParameter("url",education.getGradMemoUrl())
                     .executeUpdate();
         }
         if (getEducationDetailsByUserIdAndType(education.getId(), 2) == null) {
@@ -93,6 +95,7 @@ public class EducationDaoImplementation implements EducationDao {
                     .setParameter("cgpa", education.getSecondCgpa())
                     .setParameter("start", education.getSecondStart())
                     .setParameter("end", education.getSecondEnd())
+                    .setParameter("url",education.getSecondMemoUrl())
                     .executeUpdate();
         } else {
             entityManager.createNativeQuery(update_query)
@@ -104,6 +107,7 @@ public class EducationDaoImplementation implements EducationDao {
                     .setParameter("cgpa", education.getSecondCgpa())
                     .setParameter("start", education.getSecondStart())
                     .setParameter("end", education.getSecondEnd())
+                    .setParameter("url",education.getSecondMemoUrl())
                     .executeUpdate();
         }
         if (getEducationDetailsByUserIdAndType(education.getId(), 3) == null) {
@@ -116,6 +120,7 @@ public class EducationDaoImplementation implements EducationDao {
                     .setParameter("cgpa", education.getPrimCgpa())
                     .setParameter("start", education.getPrimStart())
                     .setParameter("end", education.getPrimEnd())
+                    .setParameter("url",education.getPrimMemoUrl())
                     .executeUpdate();
         } else {
             entityManager.createNativeQuery(update_query)
@@ -127,6 +132,7 @@ public class EducationDaoImplementation implements EducationDao {
                     .setParameter("cgpa", education.getPrimCgpa())
                     .setParameter("start", education.getPrimStart())
                     .setParameter("end", education.getPrimEnd())
+                    .setParameter("url",education.getPrimMemoUrl())
                     .executeUpdate();
         }
     }
