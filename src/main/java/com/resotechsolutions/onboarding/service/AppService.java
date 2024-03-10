@@ -21,6 +21,8 @@ public interface AppService {
 
     BaseResponse getUserDetails(String token);
 
+    BaseResponse getUserDetails1(String token);
+
     BaseResponse validateToken(String token);
 
     BaseResponse updatePassword(String username,String password,String token);

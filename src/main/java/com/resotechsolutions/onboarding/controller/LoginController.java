@@ -43,7 +43,7 @@ public class LoginController {
     @PostMapping("/get-details")
     public BaseResponse getUserDetails(@RequestHeader("token") String token){
         try {
-            log.info("***********start of forget password api in Onboarding Login Controller " + new Date());
+            log.info("***********start of get user details api in Onboarding Login Controller " + new Date());
             return appService.getUserDetails(token);
         }catch (Exception e){
             log.info(e.toString());
@@ -53,7 +53,7 @@ public class LoginController {
     @PostMapping("/forget-password/generate-otp")
     public BaseResponse generateOtp(@RequestBody UserDTO userDTO){
         try {
-            log.info("***********start of forget password api in Onboarding Login Controller " + new Date());
+            log.info("***********start of forget password-gen OTP api in Onboarding Login Controller " + new Date());
             return appService.generateOtp(userDTO.getEmail());
         }catch (Exception e){
             log.info(e.toString());

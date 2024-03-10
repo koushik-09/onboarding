@@ -5,6 +5,7 @@ public class BankDto {
     private long accountNumber;
     private String ifscCode;
     private String bankName;
+    private String bank;
 
     public BankDto() {
     }
@@ -39,5 +40,13 @@ public class BankDto {
 
     public void setBankName(String bankName) {
         this.bankName = bankName;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
     }
 }

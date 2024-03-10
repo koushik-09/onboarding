@@ -201,6 +201,16 @@ public class AppServiceImpl implements AppService {
         userDetails.setUserToken(token);
         return responseHandler.setMessageResponse("Success",1,customResponse.userDetailsResponse(userDetails));
     }
+    @Override
+    public BaseResponse getUserDetails1(String token) {
+        Token userToken = tokenDaoImplementation.getTokenDataByToken(token);
+        if (userToken == null ){
+            return responseHandler.setMessageResponse("Invalid token",-1,null);
+        }
+        UserDetails userDetails = userDetailDaoImplementation.getUserDetailsByUserId(userToken.getUserDetails().getUser_id());
+        userDetails.setUserToken(token);
+        return responseHandler.setMessageResponse("Success",1,customResponse.userDetailsResponse(userDetails));
+    }
 
 
     @Override
@@ -255,6 +265,13 @@ public class AppServiceImpl implements AppService {
             return responseHandler.setMessageResponse("Invalid Document type",-1,null);
         }
         String dir =FOLDER_PATH+"/documents/" + documentType.toLowerCase();
+        if(documentType.equalsIgnoreCase("gradMemoUrl")){
+            dir = FOLDER_PATH+"/documents/" + "graduation-certificates";
+        }if(documentType.equalsIgnoreCase("secondMemoUrl")){
+            dir = FOLDER_PATH+"/documents/" + "secondary-certificates";
+        }if(documentType.equalsIgnoreCase("primMemoUrl")){
+            dir = FOLDER_PATH+"/documents/" + "primary-certificates";
+        }
         try{
             //creating directory
             Files.createDirectories(Paths.get(dir));
@@ -263,14 +280,13 @@ public class AppServiceImpl implements AppService {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
             String timestamp = dateFormat.format(currentDate);
             //naming file
-//            String name = Objects.requireNonNull(file.getOriginalFilename()).replace(" ","-" );
             String fileName = userId + "_"+timestamp+"_"+file.getOriginalFilename().replace(" ","-");
             //generating file path
             String filePath = dir + "/" + fileName;
             //saving the file
             Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
+            filePath = filePath.replace(FOLDER_PATH,"https://resotechsolutions.in/onboarding");
             documentDaoImplementation.updateUrl(filePath,userId);
-//            documentDaoImplementation.updateUserDocuments(filePath,userId,type);
             return responseHandler.setMessageResponse("Upload Success",1,filePath);
         } catch (IOException e) {
             log.warn(e.toString());
@@ -299,7 +315,6 @@ public class AppServiceImpl implements AppService {
             String timestamp = String.valueOf(new Timestamp(System.currentTimeMillis()));
             String fileName = userId + "_"+file.getOriginalFilename();
             String filePath = dir + "/" + fileName;
-//            file.transferTo(Paths.get(filePath)); documentType.equalsIgnoreCase("pan")
             Files.copy(file.getInputStream(), Paths.get(filePath), StandardCopyOption.REPLACE_EXISTING);
             if(file.getOriginalFilename().toLowerCase().contains("pan")){
                 documentDaoImplementation.updateUserDocuments(filePath,userId,1);

@@ -3,6 +3,7 @@ package com.resotechsolutions.onboarding.response;
 import com.resotechsolutions.onboarding.entity.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -92,6 +93,65 @@ public class CustomResponse {
         responseMap.put("token",userDetails.getUserToken());
         if(userDetails.getAddress() != null){
             data++;
+            responseMap.put("address",userDetails.getAddress());
+        }
+        if(!userDetails.getEducation().isEmpty()){
+            data++;
+            for(int i=0;i<userDetails.getEducation().size();i++){
+                if(userDetails.getEducation().get(i).getType() == 1){
+                    userDetails.getEducation().get(i).setName("Graduation");
+                }else if(userDetails.getEducation().get(i).getType() == 2){
+                    userDetails.getEducation().get(i).setName("Secondary");
+                }else if(userDetails.getEducation().get(i).getType() == 3){
+                    userDetails.getEducation().get(i).setName("Primary");
+                }
+            }
+            responseMap.put("Education Details",userDetails.getEducation());
+        }
+        if(!userDetails.getDocuments().isEmpty()){
+            data+=userDetails.getDocuments().size();
+            for(int i=0;i<userDetails.getDocuments().size();i++) {
+                if (userDetails.getDocuments().get(i).getType() == 1) {
+                    userDetails.getDocuments().get(i).setName("Pan Card");
+                } else if (userDetails.getDocuments().get(i).getType() == 2) {
+                    userDetails.getDocuments().get(i).setName("Aadhar Card");
+                } else if (userDetails.getDocuments().get(i).getType() == 3) {
+                    userDetails.getDocuments().get(i).setName("Agreement");
+                }
+            }
+            responseMap.put("Documents",userDetails.getDocuments());
+        }
+        if(userDetails.getBank()!=null){
+            data++;
+            responseMap.put("Bank Details",userDetails.getBank());
+        }
+        responseMap.put("active",userDetails.isActive());
+        responseMap.put("admin",userDetails.isAdmin());
+        responseMap.put("passwordUpdated",userDetails.isPasswordUpdated());
+        int percentage = (data*100)/7;
+        responseMap.put("Percentage Complete",percentage);
+        return responseMap;
+    }
+    public Map<String,Object> userDetailsResponse1(UserDetails userDetails){
+        Map<String,Object> responseMap = new LinkedHashMap<>();
+        int data = 1;
+        responseMap.put("user_id",userDetails.getUser_id());
+        responseMap.put("username",userDetails.getUserName());
+        responseMap.put("firstName",userDetails.getFirstName());
+        responseMap.put("lastName",userDetails.getLastName());
+        responseMap.put("email",userDetails.getEmail());
+        responseMap.put("token",userDetails.getUserToken());
+        if(userDetails.getAddress() != null){
+            data++;
+            try{
+                Field[] fields = userDetails.getAddress().getClass().getDeclaredFields();
+                for(Field field : fields){
+                    field.setAccessible(true);
+                    responseMap.put(field.getName(),field.get(userDetails.getAddress()));
+                }
+            } catch (IllegalAccessException ignored) {
+
+            }
             responseMap.put("address",userDetails.getAddress());
         }
         if(!userDetails.getEducation().isEmpty()){

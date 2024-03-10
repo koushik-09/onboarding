@@ -10,7 +10,9 @@ import com.resotechsolutions.onboarding.service.AppServiceImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -57,8 +59,8 @@ public class FormController {
             log.info("***********start of document details update api in Onboarding form Controller " + new Date());
             return appService.updateDocumentDetails(token,documentDto);
         }catch (Exception e){
-            log.info(e.toString());
-            return responseHandler.setMessageResponse(-2);
+                log.info(e.toString());
+                return responseHandler.setMessageResponse(-2);
         }
     }
 
@@ -70,8 +72,8 @@ public class FormController {
             log.info("***********start of upload document api in Onboarding form Controller " + new Date());
             return appService.updateUserDocuments(file,token,docType);
         }catch (Exception e){
-            log.info(e.toString());
-            return responseHandler.setMessageResponse(-2);
+                log.info(e.toString());
+                return responseHandler.setMessageResponse(-2);
         }
     }
     @PostMapping("/upload-multiple-documents")

@@ -2,7 +2,6 @@ package com.resotechsolutions.onboarding.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.checkerframework.checker.units.qual.C;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -25,6 +24,9 @@ public class Bank {
 
     @Column(name = "bank_name")
     private String bankName;
+
+    @Column(name = "url")
+    private String url;
 
     @OneToOne
     @JoinColumn(name = "user_id")
@@ -72,6 +74,14 @@ public class Bank {
 
     public void setBankName(String bankName) {
         this.bankName = bankName;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String cheque) {
+        this.url = cheque;
     }
 
     public UserDetails getUserDetails() {

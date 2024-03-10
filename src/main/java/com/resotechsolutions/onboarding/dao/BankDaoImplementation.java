@@ -38,16 +38,17 @@ public class BankDaoImplementation implements BankDao {
     @Override
     public void updateBankDetailsByUserId(BankDto bankDto) {
         String insert_query =
-                "insert into bank_details(user_id,account_number,ifsc,bank_name) values (:theId,:accNo,:ifsc,:name)";
+                "insert into bank_details(user_id,account_number,ifsc,bank_name,url) values (:theId,:accNo,:ifsc,:name,:url)";
 
         String update_query =
-                "update bank_details set account_number = :accNo,ifsc = :ifsc, updated_on = :time, bank_name = :name where user_id = :theId";
+                "update bank_details set account_number = :accNo,ifsc = :ifsc, updated_on = :time, bank_name = :name, url=:url where user_id = :theId";
         if(getIdByUserId(bankDto.getId())==null){
             entityManager.createNativeQuery(insert_query)
                     .setParameter("theId",bankDto.getId())
                     .setParameter("accNo",bankDto.getAccountNumber())
                     .setParameter("ifsc",bankDto.getIfscCode())
                     .setParameter("name",bankDto.getBankName())
+                    .setParameter("url",bankDto.getBank())
                     .executeUpdate();
         }else {
             entityManager.createNativeQuery(update_query)
@@ -56,8 +57,8 @@ public class BankDaoImplementation implements BankDao {
                     .setParameter("ifsc",bankDto.getIfscCode())
                     .setParameter("name",bankDto.getBankName())
                     .setParameter("time",new Timestamp(System.currentTimeMillis()))
+                    .setParameter("url",bankDto.getBank())
                     .executeUpdate();
         }
     }
-
 }
